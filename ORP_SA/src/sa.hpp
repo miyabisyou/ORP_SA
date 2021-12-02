@@ -30,16 +30,12 @@ void sa(hostswitch &indiv)
 
   #if GRAPH_LOG == 1
   graph_File << "0, " << indiv.diameter << ", " << indiv.ASPL << ", " << indiv.switches << endl;
-  //graph_File << "0, " << indiv.diameter << ", " << indiv.ASPL - indiv.low_ASPL << ", " << indiv.switches << endl;
   #endif
   
   hostswitch child;
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
-    //child.show_edges();
-    //cout<<child.port_f<<endl;
-    //inc_switch(child);/*
     if(param::search_type == 0)
       n_search_rand(child);
     else
@@ -51,7 +47,6 @@ void sa(hostswitch &indiv)
       copy_HS(child, indiv);
       #if GRAPH_LOG == 1
       graph_File << gene + 1 << ", " << indiv.diameter << ", " << indiv.ASPL << ", " << indiv.switches << endl;
-      //graph_File << gene + 1 << ", " << indiv.diameter << ", " << indiv.ASPL - indiv.low_ASPL << ", " << indiv.switches << endl;
       #endif
     }
     gene++;
