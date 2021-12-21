@@ -4,8 +4,8 @@
 using namespace std;
 
 //hostswitch
-#define HOSTS 32
-#define RADIX 4
+#define HOSTS 8
+#define RADIX 3
 #define SEED 0
 #define OFFSET 0
 #define TES 1
@@ -22,7 +22,7 @@ using namespace std;
 #define MIN_TEMP 0.25			//終了温度
 #define COOL_RATE 0.995			//冷却率
 #define ITERATIONS 1			//反復回数
-#define NCALCS 1000000		//計算回数(if don't used this value is -1)
+#define NCALCS 10		//計算回数(if don't used this value is -1)
 #define SET_TEMP 1		//0 -> 温度自動設定オフ, 1 -> 温度自動設定オン
 #define SET_TEMP_F true
 
@@ -30,10 +30,10 @@ using namespace std;
 #define NSEARCH 0		//0 -> rand, 1 -> each
 
 //TEXT_LOG
-#define GRAPH_LOG 1		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
-#define EDGES_OUT 1		//0 -> エッジ出力オフ, 1 -> エッジ出力オン
-#define RESULT_LOG 1	//0 -> 結果出力オフ, 1 -> 結果出力オン
-#define CSV_OUT 1		//0 -> 結果(csv)出力オフ, 1 -> 結果(csv)出力オン
+#define GRAPH_LOG 0		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
+#define EDGES_OUT 0		//0 -> エッジ出力オフ, 1 -> エッジ出力オン
+#define RESULT_LOG 0	//0 -> 結果出力オフ, 1 -> 結果出力オン
+#define CSV_OUT 0		//0 -> 結果(csv)出力オフ, 1 -> 結果(csv)出力オン
 
 namespace param
 {

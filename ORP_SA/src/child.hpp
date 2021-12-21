@@ -25,6 +25,8 @@ extern "C"
 	void ORP_Restore_adjacency(const ORP_Restore r, const int radix, int *h_degree, int *s_degree, int *adjacency);
 	void ORP_Swap_adjacency(const int switches, const int radix, const int* s_degree, ORP_Restore *r, int *adjacency);
 	void ORP_Swing_adjacency(const int switches, const int radix, int *h_degree, int *s_degree, ORP_Restore *r, int *adjacency);
+	void ORP_Conv_adjacency2edge(const int hosts, const int switches, const int radix, const int *h_degree,const int *s_degree, const int *adjacency, int *edge);
+	int ORP_Optimize_switches(const int hosts, const int radix);
 }
 
 using namespace std;
@@ -53,16 +55,20 @@ int check_edges(vector<vector<int>> edges)
 		}
 	}
 	return f;
+
 }
 
 class hostswitch
 {
 public:
 	vector<vector<int>> edges;
+	vector<vector<int>> adja;
+	vector<int> h_deg, s_deg;
 	int switches, lines, diameter = -1, low_diameter = -1;
 	double ASPL = -1, low_ASPL = -1;
 	long sum;
 	int port_f;
+	ORP_Restore r;
 
 	void Initialize(void)
 	{
@@ -105,19 +111,76 @@ public:
 		}
 	}
 
+	void vec_to_arr(int *edge_arr)
+	{
+		for(int i = 0; i < edges.size(); i++)
+		{
+			edge_arr[i * 2] = edges[i][0];
+			edge_arr[i * 2 + 1] = edges[i][1];
+		}
+	}
+
+	void d_atov(int *h_degree, int *s_degree)
+	{
+		for(int i = 0; i < switches; i++)
+		{
+			h_deg[i] = h_degree[i];
+			s_deg[i] = s_degree[i];
+		}
+	}
+
+	void d_vtoa(int *h_degree, int *s_degree)
+	{
+		for(int i = 0; i < switches; i++)
+		{
+			h_degree[i] = h_deg[i];
+			s_degree[i] = s_deg[i];
+		}
+	}
+
+	void adja_atov(int *adjacency)
+	{
+		for(int i = 0; i < switches; i++)
+		{
+			for(int j = 0; j < param::radix; j ++)
+			{
+				adja[i][j] = adjacency[i * param::radix + j];
+			}
+		}
+	}
+
+	void adja_vtoa(int *adjacency)
+	{
+		for(int i = 0; i < switches; i++)
+		{
+			for(int j = 0; j < param::radix; j ++)
+			{
+				adjacency[i * param::radix + j] = adja[i][j];
+			}
+		}
+	}
+
 	void Init(void)
 	{
 		bool assign_evenly = false;
 		lines = (switches * param::radix - param::hosts) / 2 + param::hosts;
 		int *s_degree = (int*)malloc(sizeof(int) * switches);
   		int *h_degree = (int*)malloc(sizeof(int) * switches);
+		int *adjacency = (int*)malloc(sizeof(int) * switches * param::radix);
 		//int *edge = (int*)malloc(sizeof(int) * lines * 2);
 
-		edges.assign(lines, vector<int>(2, 0));
+		//edges.assign(lines, vector<int>(2, 0));
 		//ORP_Srand(SEED);
   		int *edge = (int*)ORP_Generate_random(param::hosts, switches, param::radix, assign_evenly, &lines, h_degree, s_degree);
-		
-		arr_to_vec(edge);
+		//arr_to_vec(edge);
+
+		ORP_Conv_edge2adjacency(param::hosts, switches, param::radix, lines, edge, adjacency);
+		adja.assign(switches, vector<int>(param::radix, 0));
+		adja_atov(adjacency);
+
+		h_deg.resize(switches);
+		s_deg.resize(switches);
+		d_atov(h_degree, s_degree);////////////
 
 		free(edge);
 		free(h_degree);
@@ -153,17 +216,19 @@ public:
 	}
 	void show_edges(void)
 	{
-		for(int i = 0; i < edges.size(); i++)
+		for(unsigned int i = 0; i < edges.size(); i++)
 			printf("%d : %d, %d\n", i, edges[i][0], edges[i][1]);
 		printf("\n");
 	}
 
-	void vec_to_arr(int *edge_arr)
+	void show_adja(void)
 	{
-		for(int i = 0; i < edges.size(); i++)
+		for(unsigned int i = 0; i < adja.size(); i++)
 		{
-			edge_arr[i * 2] = edges[i][0];
-			edge_arr[i * 2 + 1] = edges[i][1];
+			cout << i << " : " << adja[i][0];
+			for(unsigned int j = 1; j < adja[j].size(); j++)
+				cout << ", " << adja[i][j];
+			cout << endl;  
 		}
 	}
 
@@ -171,37 +236,54 @@ public:
 	{
 		port_f = -1;
 		int sum;
-      	for(int i = param::hosts; i < param::hosts + switches; i++)
+      	for(int i = 0; i < switches; i++)
       	{
-        	sum = 0;
-        	for(unsigned int j = 0; j < edges.size(); j++)
-        	{
-          		if(edges[j][0] == i || edges[j][1] == i)
-            	sum++;
-        	}
-    	    if(sum < param::radix)
-        	{
+          	if(h_deg[i] + s_deg[i] != param::radix)
+    	    {
           		port_f = i;
           		break;
         	}
       	}
 	}
 
+	void set_degree(void)
+	{
+		int temp_s, temp_h;
+		for(unsigned int i = 0; i < adja.size(); i++)
+		{
+			temp_s = 0;
+			temp_h = 0;
+			for(unsigned int j = 0; j < adja[i].size(); j++)
+			{
+				if(adja[i][j] == -1)
+					temp_s++;
+				else
+					temp_h++;
+			}
+			s_deg[i] = temp_s;
+			h_deg[i] = temp_h;
+		}
+		if(port_f != -1)
+			h_deg[port_f]--;
+	}
+
 	void evaluation(void)
 	{
 		//update of degree and adjacency
 		//lines = (switches * param::radix - param::hosts) / 2 + param::hosts;
-		int *edge = (int*)malloc(sizeof(int) * lines * 2);
+		//int *edge = (int*)malloc(sizeof(int) * lines * 2);
 		int *adjacency = (int*)malloc(sizeof(int) * switches * param::radix);
 		int *s_degree = (int*)malloc(sizeof(int) * switches);
 		int *h_degree = (int*)malloc(sizeof(int) * switches);
 
-		vec_to_arr(edge);
+		//vec_to_arr(edge);
 
-		ORP_Conv_edge2adjacency(param::hosts, switches, param::radix, lines, edge, adjacency);
+		//ORP_Conv_edge2adjacency(param::hosts, switches, param::radix, lines, edge, adjacency);
 
 		ORP_Init_aspl(param::hosts, switches, param::radix);
-		ORP_Set_degrees(param::hosts, switches, lines, edge, h_degree, s_degree);
+		//ORP_Set_degrees(param::hosts, switches, lines, edge, h_degree, s_degree);
+		d_vtoa(h_degree, s_degree);
+		adja_vtoa(adjacency);
 		ORP_Set_aspl(h_degree, s_degree, adjacency, &diameter, &sum, &ASPL);
 		ORP_Set_lbounds(param::hosts, param::radix, &low_diameter, &low_ASPL);
 		ORP_Finalize_aspl();
@@ -211,7 +293,7 @@ public:
 		free(adjacency);
 		free(h_degree);
 		free(s_degree);
-		free(edge);
+		//free(edge);
 	}
 
 	void output(string filename)
@@ -223,10 +305,25 @@ public:
         	std::cout << "dose not open the output file." << std::endl;
         	exit(0);
     	}
+
+		int *edge = (int*)malloc(sizeof(int) * lines * 2);
+		int *adjacency = (int*)malloc(sizeof(int) * switches * param::radix);
+		int *s_degree = (int*)malloc(sizeof(int) * switches);
+		int *h_degree = (int*)malloc(sizeof(int) * switches);
+		adja_vtoa(adjacency);
+		d_vtoa(h_degree, s_degree);
+		ORP_Conv_adjacency2edge(param::hosts, switches, param::radix, h_degree, s_degree, adjacency, edge);
+		edges.assign(lines, vector<int>(2, 0));
+		arr_to_vec(edge);
 		
 		Output_File << param::hosts << " " << switches << " " << param::radix << endl;
 		for(unsigned int i = 0; i < edges.size(); i++)
 			Output_File << edges[i][0] << " " << edges[i][1] << endl;
+		
+		free(adjacency);
+		free(h_degree);
+		free(s_degree);
+		free(edge);
 	}
 
 	void outputlog(string filename, double time)

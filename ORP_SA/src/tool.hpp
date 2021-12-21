@@ -5,61 +5,8 @@
 
 using namespace std;
 
-#define ERROR(...) do{fprintf(stderr,__VA_ARGS__); exit(1);}while(0)
+//#define ERROR(...) do{fprintf(stderr,__VA_ARGS__); exit(1);}while(0)
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-//Optimize_switches
-double moore_bound(const double nodes, const double degree)
-{
-	if (degree + 1 >= nodes)
-		return 1;
-
-	double diam = -1, n = 1, r = 1, aspl = 0.0, prev_tmp;
-	while (1) {
-		double tmp = n + degree * pow(degree - 1, r - 1);
-		if (tmp >= nodes || (r > 1 && prev_tmp == tmp))
-			break;
-
-		n = tmp;
-		aspl += r * degree * pow(degree - 1, r - 1);
-		diam = r++;
-		prev_tmp = tmp;
-	}
-
-	diam++;
-	aspl += diam * (nodes - n);
-	aspl /= (nodes - 1);
-
-	return aspl;
-}
-static double continuous_moore_bound(const int hosts, const int switches, const int radix)
-{
-	double h = hosts;
-	double s = switches;
-	double r = radix;
-	return moore_bound(s, r - h / s)*(s*h - h) / (s*h - s) + 2;
-}
-int ORP_Optimize_switches(const int hosts, const int radix)
-{
-	if (hosts < 3)
-		ERROR("Hosts (%d) >= 3\n", hosts);
-	else if (radix < 3)
-		ERROR("Radix (%d) >= 3\n", radix);
-
-	int s = 3;
-	double prev = DBL_MAX;
-	while (1) {
-		if (s*radix - 2 * (s - 1) >= hosts) {
-			double tmp = continuous_moore_bound(hosts, s, radix);
-			if (prev <= tmp)
-				break;
-			prev = tmp;
-		}
-		s++;
-	}
-	return s - 1;
-}
-
 
 void intialize(vector<hostswitch> &group)
 {
@@ -82,11 +29,14 @@ void copy_HS(const hostswitch &A, hostswitch &B)//A->B
 {
 	B.switches = A.switches;
 	B.lines = A.lines;
-	B.edges = A.edges;
+	//B.edges = A.edges;
 	B.port_f = A.port_f;
 	B.ASPL = A.ASPL;
 	B.low_ASPL = A.low_ASPL;
 	B.diameter = A.diameter;
+  B.adja = A.adja;
+  B.h_deg = A.h_deg;
+  B.s_deg = A.s_deg;
 }
 
 void copy_group(const vector<hostswitch> &group, vector<hostswitch> &child_group)

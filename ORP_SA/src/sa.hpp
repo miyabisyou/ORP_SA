@@ -5,7 +5,7 @@
 #include "child.hpp"
 #include "param.hpp"
 #include "tool.hpp"
-#include "search.hpp"
+#include "searchad.hpp"
 
 double Fx_A(double delta_E, double T, int switches);
 
@@ -35,12 +35,13 @@ void sa(hostswitch &indiv)
   hostswitch child;
 	while (temperature > min_temp)
 	{
+    hostswitch child;
+    //indiv.show_adja();
     copy_HS(indiv, child);
     if(param::search_type == 0)
-      n_search_rand(child);
+      search_rand(child);
     else
-      n_search_each(child);//*/
-    sort_edges(child);
+      search_each(child);//*/
     child.evaluation();
     if((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter <= indiv.diameter) 
     {
