@@ -39,7 +39,7 @@ void sa(hostswitch &indiv)
     if(param::search_type == 0)
       n_search_rand(child);
     else
-      n_search_each(child);//*/
+      n_search_each(child);
     sort_edges(child);
     child.evaluation();
     if((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter <= indiv.diameter) 

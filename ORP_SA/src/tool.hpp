@@ -244,5 +244,10 @@ void set_temp(void)
   param_sa::temp0 = (-1.0 * max_diff_energy) / log(0.5);
   param_sa::tempF = (-2.0) / log(0.0001);                           
   
+  SAFE_FREE(h_degree);
+  SAFE_FREE(s_degree);
+  SAFE_FREE(edge);
+  SAFE_FREE(adjacency);
+
   return;
 }

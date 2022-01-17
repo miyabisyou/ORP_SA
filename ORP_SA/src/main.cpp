@@ -53,6 +53,7 @@ int main(int argc, char * argv[])
 			hostswitch indiv;
 			indiv.switches = ORP_Optimize_switches(param::hosts, param::radix) + param::offset; 
 			indiv.Init();
+			//indiv.show_edges();
 			sa(indiv);
 			string fname = "sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset);
 			clock_t end = clock();

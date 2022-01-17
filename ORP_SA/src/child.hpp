@@ -13,6 +13,8 @@ typedef struct {
   int u[2], v[2], u_d[2], v_d[2], switches, symmetries, op;
 } ORP_Restore;
 
+#define SAFE_FREE(ptr) { free(ptr); ptr = NULL; }
+
 extern "C"
 {
 	void ORP_Conv_edge2adjacency(const int hosts, const int switches, const int radix, const int lines, const int *edge, int *adjacency);
@@ -25,6 +27,7 @@ extern "C"
 	void ORP_Restore_adjacency(const ORP_Restore r, const int radix, int *h_degree, int *s_degree, int *adjacency);
 	void ORP_Swap_adjacency(const int switches, const int radix, const int* s_degree, ORP_Restore *r, int *adjacency);
 	void ORP_Swing_adjacency(const int switches, const int radix, int *h_degree, int *s_degree, ORP_Restore *r, int *adjacency);
+	void ORP_Conv_adjacency2edge(const int hosts, const int switches, const int radix, const int *h_degree, const int *s_degree, const int *adjacency, int *edge);
 }
 
 using namespace std;
@@ -63,6 +66,7 @@ public:
 	double ASPL = -1, low_ASPL = -1;
 	long sum;
 	int port_f;
+	ORP_Restore r;
 
 	void Initialize(void)
 	{
@@ -96,15 +100,6 @@ public:
 		} while (f == 0);
 	}
 
-	void arr_to_vec(int *edge_arr)
-	{
-		for(int i = 0; i < edges.size(); i++)
-		{
-			edges[i][0] = edge_arr[i * 2];
-			edges[i][1] = edge_arr[i * 2 + 1];
-		}
-	}
-
 	void Init(void)
 	{
 		bool assign_evenly = false;
@@ -119,9 +114,9 @@ public:
 		
 		arr_to_vec(edge);
 
-		free(edge);
-		free(h_degree);
-		free(s_degree);
+		SAFE_FREE(edge);
+		SAFE_FREE(h_degree);
+		SAFE_FREE(s_degree);
 	}
 
 	/*void Init(string filename)
@@ -167,6 +162,15 @@ public:
 		}
 	}
 
+	void arr_to_vec(int *edge_arr)
+	{
+		for(int i = 0; i < edges.size(); i++)
+		{
+			edges[i][0] = edge_arr[i * 2];
+			edges[i][1] = edge_arr[i * 2 + 1];
+		}
+	}
+
 	void check_port(void)
 	{
 		port_f = -1;
@@ -177,7 +181,12 @@ public:
         	for(unsigned int j = 0; j < edges.size(); j++)
         	{
           		if(edges[j][0] == i || edges[j][1] == i)
-            	sum++;
+				{
+					if(edges[j][0] == edges[j][1])
+						sum += 2;
+					else
+						sum++;
+				}	
         	}
     	    if(sum < param::radix)
         	{
@@ -185,6 +194,20 @@ public:
           		break;
         	}
       	}
+	}
+
+	void check_edge(void)
+	{
+		vector<int> count(param::hosts + switches, 0);
+		for(unsigned int i = 0; i < edges.size(); i++)
+		{
+			count[edges[i][0]]++;
+			count[edges[i][1]]++;
+		}
+		for(unsigned int i = 0; i < count.size(); i++)
+		{
+			cout << i << " :: " << count[i] << endl;
+		}
 	}
 
 	void evaluation(void)
@@ -208,10 +231,10 @@ public:
 
 		//print_eva();
 		//free
-		free(adjacency);
-		free(h_degree);
-		free(s_degree);
-		free(edge);
+		SAFE_FREE(adjacency);
+		SAFE_FREE(h_degree);
+		SAFE_FREE(s_degree);
+		SAFE_FREE(edge);
 	}
 
 	void output(string filename)
