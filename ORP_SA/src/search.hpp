@@ -36,7 +36,7 @@ void swap(hostswitch &child)
 //swap the host and switch
 void swing(hostswitch &child)
 {
-   int *edge = (int*)malloc(sizeof(int) * child.lines * 2);
+  int *edge = (int*)malloc(sizeof(int) * child.lines * 2);
 	int *adjacency = (int*)malloc(sizeof(int) * child.switches * param::radix);
 	int *s_degree = (int*)malloc(sizeof(int) * child.switches);
 	int *h_degree = (int*)malloc(sizeof(int) * child.switches);
@@ -208,7 +208,7 @@ void de_switch(hostswitch &child)
 void n_search_rand(hostswitch &indiv)
 {
   int f = 0;
-  f = rand() % 3;
+  f = rand() % 4;
   //cout << "f=" << f << endl;
   //indiv.show_edges();
   //cout << indiv.switches << ", " << indiv.port_f << endl;
