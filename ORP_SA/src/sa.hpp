@@ -32,7 +32,8 @@ void sa(hostswitch &indiv)
   graph_File << "0, " << indiv.diameter << ", " << indiv.ASPL << ", " << indiv.switches << endl;
   #endif
   
-  hostswitch child;
+  hostswitch child, best_indiv;
+  copy_HS(indiv, best_indiv);   //generate best_invid
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
@@ -42,7 +43,12 @@ void sa(hostswitch &indiv)
       n_search_each(child);
     sort_edges(child);
     child.evaluation();
-    if((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter <= indiv.diameter) 
+    //memory best solution
+    if(child.diameter < best_indiv.diameter || (child.diameter == best_indiv.diameter && child.ASPL < best_indiv.ASPL))
+      copy_HS(child, best_indiv);
+    //accept
+    //if((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter <= indiv.diameter)
+    if(child.diameter < indiv.diameter || ((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter == indiv.diameter))
     {
       copy_HS(child, indiv);
       #if GRAPH_LOG == 1
@@ -56,6 +62,7 @@ void sa(hostswitch &indiv)
     fflush(stdout);
 	}
   cout << endl;
+  copy_HS(best_indiv, indiv);
   indiv.evaluation();
   indiv.print_eva();
 }

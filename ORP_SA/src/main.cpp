@@ -32,6 +32,7 @@ int main(int argc, char * argv[])
 	for (int test = 0; test < param::tes; test++)
 	{
 		srand(param::seed);
+		randomseed = mt19937(param::seed);
 		cout << "seed = " << param::seed << endl;
 		clock_t start = clock();
 		#if SOLUTION == 0		//GA

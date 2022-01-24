@@ -5,13 +5,6 @@
 #include "param.hpp"
 #include "tool.hpp"
 
-void swap_int(int *a, int *b)
-{
-  int temp = *a;
-  *a = *b;
-  *b = temp;
-}
-
 //swap switch
 void swap(hostswitch &child)
 {
@@ -55,7 +48,7 @@ void swing(hostswitch &child)
 }
 
 //increase switch
-void inc_switch(hostswitch &child)
+void add_switch(hostswitch &child)
 {
   //Search for open ports
   child.check_port();
@@ -107,7 +100,7 @@ void inc_switch(hostswitch &child)
 }
 
 //decrease switch
-void de_switch(hostswitch &child)
+void reduce_switch(hostswitch &child)
 {
   if((child.switches - 1) * (param::radix - 2) + 2 < param::hosts)
     return;
@@ -209,16 +202,10 @@ void n_search_rand(hostswitch &indiv)
 {
   int f = 0;
   f = rand() % 4;
-  //cout << "f=" << f << endl;
-  //indiv.show_edges();
-  //cout << indiv.switches << ", " << indiv.port_f << endl;
-  //indiv.check_edge();
-  //indiv.show_edges();
-  //cout << "f=" << f << endl;
   if(f == 0)
-    inc_switch(indiv);
+    add_switch(indiv);
   else if(f == 1)
-    de_switch(indiv);
+    reduce_switch(indiv);
   else if(f == 2)
     swap(indiv);
   else if(f == 3)
@@ -230,9 +217,9 @@ void n_search_each(hostswitch &indiv)
   int f = 0;
   f = rand() % 3;
   if(f == 0)
-    inc_switch(indiv);
+    add_switch(indiv);
   else if(f == 1)
-    de_switch(indiv);
+    reduce_switch(indiv);
   f = rand() % 2;
   if(f == 0)
     swap(indiv);
@@ -248,9 +235,9 @@ void n_search_each(vector<hostswitch> &group)
   {
     f = rand() % 3;
     if(f == 0)
-      inc_switch(group[i]);
+      add_switch(group[i]);
     else if(f == 1)
-      de_switch(group[i]);        
+      reduce_switch(group[i]);        
     f = rand() % 2;
     if(f == 0)
       swap(group[i]);
@@ -267,9 +254,9 @@ void n_search_rand(vector<hostswitch> &group)
   {
     f = rand() % 4;
     if(f == 0)
-      inc_switch(group[i]);
+      add_switch(group[i]);
     else if(f == 1)
-      de_switch(group[i]);        
+      reduce_switch(group[i]);        
     else if(f == 2)
       swap(group[i]);
     else if(f == 3)
