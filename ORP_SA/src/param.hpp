@@ -34,6 +34,7 @@ using namespace std;
 #define EDGES_OUT 1		//0 -> エッジ出力オフ, 1 -> エッジ出力オン
 #define RESULT_LOG 1	//0 -> 結果出力オフ, 1 -> 結果出力オン
 #define CSV_OUT 1		//0 -> 結果(csv)出力オフ, 1 -> 結果(csv)出力オン
+#define DoNS 1		//0 -> 近傍差出力オフ, 1 -> 近傍差出力オン
 
 namespace param
 {

@@ -198,7 +198,7 @@ void reduce_switch(hostswitch &child)
   child.lines = (int)child.edges.size();
 }
 
-void n_search_rand(hostswitch &indiv)
+int n_search_rand(hostswitch &indiv)
 {
   int f = 0;
   f = rand() % 4;
@@ -210,9 +210,11 @@ void n_search_rand(hostswitch &indiv)
     swap(indiv);
   else if(f == 3)
     swing(indiv);
+  
+  return f;
 }
 
-void n_search_each(hostswitch &indiv)
+int n_search_each(hostswitch &indiv)
 {
   int f = 0;
   f = rand() % 3;
@@ -226,6 +228,8 @@ void n_search_each(hostswitch &indiv)
   f = rand() % 2;
   if(f == 0)
     swing(indiv);
+
+  return f;
 }
 
 void n_search_each(vector<hostswitch> &group)

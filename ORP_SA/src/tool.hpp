@@ -89,6 +89,31 @@ void copy_HS(const hostswitch &A, hostswitch &B)//A->B
 	B.diameter = A.diameter;
 }
 
+vector<double> ave_dons(const int &f, const vector<vector <double>> &dons)
+{
+	double d_sum = 0, a_sum = 0;
+	int d_count = 0, a_count = 0;
+
+	for(unsigned int i = 0; i < dons.size(); i++)
+	{
+		if(dons[i][0] == f && dons[i][1] < 100000)
+		{
+			if(dons[i][1] == 0)
+			{
+				a_sum += dons[i][2];
+				a_count++;
+			}
+			else
+			{
+				d_sum += dons[i][1];
+				d_count++;
+			}
+		}
+	}
+	//cout << d_sum << ", " << d_count << ", "  << a_sum << ", "  << a_count <<endl;
+	return vector<double>({d_sum / d_count, a_sum / a_count});
+}
+
 void copy_group(const vector<hostswitch> &group, vector<hostswitch> &child_group)
 {
 	if(group.size() >= child_group.size())

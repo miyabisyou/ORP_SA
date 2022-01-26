@@ -20,10 +20,44 @@ void sa(hostswitch &indiv)
    	exit(0);
   }
   #endif
+  #if DoNS == 1
+  mkdir("./../DoNS", S_IRUSR|S_IWUSR|S_IXUSR);
+	ofstream add_File("./../DoNS/sa_add_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	if(!add_File)
+  {
+  	std::cout << "dose not open the add file." << std::endl;
+   	exit(0);
+  }
+  ofstream reduce_File("./../DoNS/sa_reduce_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	if(!reduce_File)
+  {
+  	std::cout << "dose not open the reduce file." << std::endl;
+   	exit(0);
+  }
+  ofstream swap_File("./../DoNS/sa_swap_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	if(!swap_File)
+  {
+  	std::cout << "dose not open the swap file." << std::endl;
+   	exit(0);
+  }
+  ofstream swing_File("./../DoNS/sa_swing_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	if(!swing_File)
+  {
+  	std::cout << "dose not open the swing file." << std::endl;
+   	exit(0);
+  }
+  ofstream ave_File("./../DoNS/sa_ave_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	if(!ave_File)
+  {
+  	std::cout << "dose not open the ave file." << std::endl;
+   	exit(0);
+  }
+  #endif
 
   double max_temp = param_sa::temp0, min_temp = param_sa::tempF, cool_rate = param_sa::cool_rate;
-	int gene = 0;
+	int gene = 0, f;
   double temperature = max_temp;
+  vector<vector <double>> dons;
 	//evaluation
 	indiv.evaluation();
   indiv.print_eva();
@@ -38,17 +72,21 @@ void sa(hostswitch &indiv)
 	{
     copy_HS(indiv, child);
     if(param::search_type == 0)
-      n_search_rand(child);
+      f = n_search_rand(child);
     else
-      n_search_each(child);
+      f = n_search_each(child);
     sort_edges(child);
     child.evaluation();
+    //Difference of neighborhood solution
+    #if DoNS == 1
+      dons.push_back(vector<double>({(double)f, (double)child.diameter - indiv.diameter, child.ASPL - indiv.ASPL}));
+    #endif
     //memory best solution
     if(child.diameter < best_indiv.diameter || (child.diameter == best_indiv.diameter && child.ASPL < best_indiv.ASPL))
       copy_HS(child, best_indiv);
     //accept
     //if((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter <= indiv.diameter)
-    if(child.diameter < indiv.diameter || ((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter == indiv.diameter))
+    if(child.diameter < indiv.diameter || ((child.ASPL <= indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter == indiv.diameter))
     {
       copy_HS(child, indiv);
       #if GRAPH_LOG == 1
@@ -58,13 +96,34 @@ void sa(hostswitch &indiv)
     gene++;
     if(gene % param_sa::iteration == 0)
       temperature *= cool_rate;
-    printf("\rGEN:%8d, temperature:%12.6f", gene, temperature);
+    printf("\rGEN:%8d, temperature:%12.6f, switch:%4d", gene, temperature, indiv.switches);
     fflush(stdout);
 	}
   cout << endl;
   copy_HS(best_indiv, indiv);
   indiv.evaluation();
   indiv.print_eva();
+
+  #if DoNS == 1
+  for(unsigned int i = 0; i < dons.size(); i++)
+  {
+    if(dons[i][0] == 0)
+      add_File << i << ", " << dons[i][1] << ", " << dons[i][2] << endl;
+    else if(dons[i][0] == 1)
+      reduce_File << i << ", " << dons[i][1] << ", " << dons[i][2] << endl;
+    else if(dons[i][0] == 2)
+      swap_File << i << ", " << dons[i][1] << ", " << dons[i][2] << endl;
+    else
+      swing_File << i << ", " << dons[i][1] << ", " << dons[i][2] << endl; 
+  }
+  ave_File << "Kind of Operator : Ave_Diameter, Ave_ASPL  (0 -> Add_switch, 1 -> Reduce_switch, 2 -> swap, 3 -> swing)" << endl;
+  for(int i = 0; i < 4; i++)
+  {
+    vector<double> temp;
+    temp = ave_dons(i, dons);
+    ave_File << i << " : " << setprecision(10) << temp[0] << ", " << setprecision(10) << temp[1] << endl;
+  }
+  #endif
 }
 
 double Fx_A(double delta_E, double T, int switches)
