@@ -8,6 +8,8 @@ using namespace std;
 #define ERROR(...) do{fprintf(stderr,__VA_ARGS__); exit(1);}while(0)
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+#define DoNS_K 0
+
 //Optimize_switches
 double moore_bound(const double nodes, const double degree)
 {
@@ -94,22 +96,36 @@ vector<double> ave_dons(const int &f, const vector<vector <double>> &dons)
 	double d_sum = 0, a_sum = 0;
 	int d_count = 0, a_count = 0;
 
-	for(unsigned int i = 0; i < dons.size(); i++)
-	{
-		if(dons[i][0] == f && dons[i][1] < 100000)
+	//Sparat
+	#if DoNS_K == 0
+		for(unsigned int i = 0; i < dons.size(); i++)
 		{
-			if(dons[i][1] == 0)
+			if(dons[i][0] == f && dons[i][1] < 100000)
+			{
+				if(dons[i][1] == 0)
+				{
+					a_sum += dons[i][2];
+					a_count++;
+				}
+				else
+				{
+					d_sum += dons[i][1];
+					d_count++;
+				}
+			}
+		}		
+	#else
+		for(unsigned int i = 0; i < dons.size(); i++)
+		{
+			if(dons[i][0] == f && dons[i][1] < 100000)
 			{
 				a_sum += dons[i][2];
 				a_count++;
-			}
-			else
-			{
 				d_sum += dons[i][1];
 				d_count++;
 			}
 		}
-	}
+	#endif
 	//cout << d_sum << ", " << d_count << ", "  << a_sum << ", "  << a_count <<endl;
 	return vector<double>({d_sum / d_count, a_sum / a_count});
 }

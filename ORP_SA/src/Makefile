@@ -6,3 +6,8 @@ all:
 
 clean:
 	rm -f *.o *.a *.exe
+	rm ./../CSV -f -r
+	rm ./../DoNS -f -r
+	rm ./../graph -f -r
+	rm ./../log -f -r
+	rm ./../result -f -r

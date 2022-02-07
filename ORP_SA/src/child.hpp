@@ -291,7 +291,9 @@ public:
 	{
 		for(unsigned int i = 0; i < edges.size(); i++)
 		{
-			if((edges[i][0] == a || edges[i][1] == a) && (edges[i][0] == b || edges[i][1] == b))
+			//if((edges[i][0] == a || edges[i][1] == a) && (edges[i][0] == b || edges[i][1] == b))
+			//	return true;
+			if((edges[i][0] == a && edges[i][1] == b) || (edges[i][0] == b && edges[i][1] == a))
 				return true;
 		}
 		return false;
@@ -306,5 +308,24 @@ public:
 				count++;
 		}
 		return count;
+	}
+
+	void show_edges_graph(void)
+	{	
+		vector <vector<int>> temp;
+		temp.resize(param::hosts + switches);
+		for(unsigned int i = 0; i < edges.size(); i++)
+		{
+			temp[edges[i][0]].push_back(edges[i][1]);
+			temp[edges[i][1]].push_back(edges[i][0]);
+		}
+		for(unsigned int i = 0; i < temp.size(); i++)
+		{
+			sort(temp[i].begin(), temp[i].end());
+			cout << setw(4) << i << " : "<< setw(4) << temp[i][0];
+			for(unsigned int j = 1; j < temp[i].size(); j++)
+				cout << ", " << setw(4) << temp[i][j];
+			cout << endl;
+		}
 	}
 };

@@ -72,7 +72,7 @@ void add_switch(hostswitch &child)
     {
       for(int j = i + 1; j < count; j++)
       {
-        if(child.edges[label[i]][0] == child.edges[j][0] || child.edges[label[i]][0] == child.edges[label[j]][1] || child.edges[label[i]][1] == child.edges[label[j]][0] || child.edges[i][1] == child.edges[label[j]][1])
+        if(child.edges[label[i]][0] == child.edges[label[j]][0] || child.edges[label[i]][0] == child.edges[label[j]][1] || child.edges[label[i]][1] == child.edges[label[j]][0] || child.edges[label[i]][1] == child.edges[label[j]][1])
         {
           f = 1;
           safe++;
@@ -102,7 +102,7 @@ void add_switch(hostswitch &child)
 //decrease switch
 void reduce_switch(hostswitch &child)
 {
-  if((child.switches - 1) * (param::radix - 2) + 2 < param::hosts)
+  if((child.switches - 1) * (param::radix - 2) + 2 <= param::hosts)
     return;
   vector<vector<int>> temp_edges;
   vector<int> index, ind_val;
@@ -110,34 +110,58 @@ void reduce_switch(hostswitch &child)
   int safe = 0;
   //decide switch
   vector <int> label(param::hosts + child.switches, 0);
+  vector <int> ck(param::hosts + child.switches, 0);    //
   for(unsigned int i = param::hosts; i < child.edges.size(); i++)
   {
     label[child.edges[i][0]]++;
     label[child.edges[i][1]]++;
+    if(child.edges[i][0] == child.edges[i][1])    //
+      ck[child.edges[i][1]]++;                    //
   }
   vector <int> aj_label;
   for(unsigned int i = param::hosts; i < label.size(); i++)
   {
-    if (label[i] >= (int)(param::radix / 2.0 + 0.5))
+    if(label[i] - ck[i] * 2 >= param::radix - label[i])
       aj_label.push_back(i);
+    /*if(label[i] >= (int)(param::radix / 2.0 + 0.5))
+      aj_label.push_back(i);*/
   }
   if(aj_label.size() == 0)
     return;
+  /*
+  cout << endl;
+  for(int i = 0; i < label.size(); i++)
+    cout << " " << label[i];
+  cout << endl;
+  for(int i = 0; i < ck.size(); i++)
+    cout << " " << ck[i];
+  cout << endl;
+  cout << child.port_f << endl;;
+  for(int i = 0; i < aj_label.size(); i++)
+    cout << " " << aj_label[i];
+  cout << endl;*/
+
   shuffle(aj_label.begin(), aj_label.end(), randomseed);
   do
   {
     index.clear();
     ind_val.clear();
+    temp_edges.clear();
     s_num = aj_label[aj_count];
     int h_count = 0;
     for(unsigned int i = 0; i < child.edges.size(); i++)
     {
       if(child.edges[i][0] == s_num || child.edges[i][1] == s_num)
       {
-        index.push_back(i);
-        ind_val.push_back(child.edges[i][0] + child.edges[i][1] - s_num);
-        if(ind_val.back() < param::hosts)
-          h_count++;
+        if(child.edges[i][0] != child.edges[i][1])
+        {
+          index.push_back(i);
+          ind_val.push_back(child.edges[i][0] + child.edges[i][1] - s_num);
+          if(ind_val.back() < param::hosts)
+            h_count++;
+        }
+        else
+          index.push_back(i);
       }
     }
     sort(ind_val.begin(), ind_val.end());
@@ -202,6 +226,7 @@ int n_search_rand(hostswitch &indiv)
 {
   int f = 0;
   f = rand() % 4;
+  //cout << f << endl;
   if(f == 0)
     add_switch(indiv);
   else if(f == 1)
@@ -210,7 +235,8 @@ int n_search_rand(hostswitch &indiv)
     swap(indiv);
   else if(f == 3)
     swing(indiv);
-  
+
+  //indiv.show_edges();
   return f;
 }
 
