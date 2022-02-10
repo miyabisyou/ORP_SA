@@ -73,8 +73,6 @@ void sa(hostswitch &indiv)
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
-    //if(gene==275)
-      //child.show_edges_graph();
     if(param::search_type == 0)
       f = n_search_rand(child);
     else

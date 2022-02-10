@@ -53,8 +53,6 @@ void add_switch(hostswitch &child)
   //Search for open ports
   child.check_port();
   int s_num = param::hosts + child.switches;
-  int f, safe = 0;
-  int count = param::radix / 2;
   //generat label
   vector<int> label;
   for(unsigned int i = 0; i < child.edges.size(); i++)
@@ -63,30 +61,10 @@ void add_switch(hostswitch &child)
       label.push_back(i);
   }
   //select edges
-  do
-  {
-    shuffle(label.begin(), label.end(), randomseed);
-    //check duplicate
-    f = 0;
-    for(int i = 0; i < count - 1; i++)
-    {
-      for(int j = i + 1; j < count; j++)
-      {
-        if(child.edges[label[i]][0] == child.edges[label[j]][0] || child.edges[label[i]][0] == child.edges[label[j]][1] || child.edges[label[i]][1] == child.edges[label[j]][0] || child.edges[label[i]][1] == child.edges[label[j]][1])
-        {
-          f = 1;
-          safe++;
-          break;
-        }
-      }
-      if(f == 1)
-        break;
-    }
-  }while(f == 1 && safe < SAFE);
-  if(safe == SAFE)
-    return;
+  shuffle(label.begin(), label.end(), randomseed);
+
   //connect to new switch
-  for(int i = 0; i < count; i++)
+  for(int i = 0; i < param::radix / 2; i++)
   {
     child.edges.push_back(vector<int>({child.edges[label[i]][1], s_num}));
     child.edges[label[i]][1] = s_num;
@@ -107,39 +85,24 @@ void reduce_switch(hostswitch &child)
   vector<vector<int>> temp_edges;
   vector<int> index, ind_val;
   int f = 1, s_num, aj_count = 0;
-  int safe = 0;
   //decide switch
   vector <int> label(param::hosts + child.switches, 0);
-  vector <int> ck(param::hosts + child.switches, 0);    //
+  vector <int> ck(param::hosts + child.switches, 0); 
   for(unsigned int i = param::hosts; i < child.edges.size(); i++)
   {
     label[child.edges[i][0]]++;
     label[child.edges[i][1]]++;
-    if(child.edges[i][0] == child.edges[i][1])    //
-      ck[child.edges[i][1]]++;                    //
+    if(child.edges[i][0] == child.edges[i][1])
+      ck[child.edges[i][1]]++;
   }
   vector <int> aj_label;
   for(unsigned int i = param::hosts; i < label.size(); i++)
   {
     if(label[i] - ck[i] * 2 >= param::radix - label[i])
       aj_label.push_back(i);
-    /*if(label[i] >= (int)(param::radix / 2.0 + 0.5))
-      aj_label.push_back(i);*/
   }
   if(aj_label.size() == 0)
     return;
-  /*
-  cout << endl;
-  for(int i = 0; i < label.size(); i++)
-    cout << " " << label[i];
-  cout << endl;
-  for(int i = 0; i < ck.size(); i++)
-    cout << " " << ck[i];
-  cout << endl;
-  cout << child.port_f << endl;;
-  for(int i = 0; i < aj_label.size(); i++)
-    cout << " " << aj_label[i];
-  cout << endl;*/
 
   shuffle(aj_label.begin(), aj_label.end(), randomseed);
   do
@@ -187,17 +150,6 @@ void reduce_switch(hostswitch &child)
       if(child.port_f == ind_val.back())
         f = 0;
     }
-    //new edges check
-    for(unsigned int i = 0; i < temp_edges.size(); i++)
-    {
-      if(f == 0)
-        break;
-      if(child.constrain_edges(temp_edges[i][0], temp_edges[i][1]))
-      {
-        f = 0;
-        break;
-      }
-    }
     aj_count++;
   }while(f == 0 && aj_count < (int)aj_label.size());
   if(aj_count == (int)aj_label.size())
@@ -226,7 +178,6 @@ int n_search_rand(hostswitch &indiv)
 {
   int f = 0;
   f = rand() % 4;
-  //cout << f << endl;
   if(f == 0)
     add_switch(indiv);
   else if(f == 1)
@@ -235,8 +186,7 @@ int n_search_rand(hostswitch &indiv)
     swap(indiv);
   else if(f == 3)
     swing(indiv);
-
-  //indiv.show_edges();
+    
   return f;
 }
 

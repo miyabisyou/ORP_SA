@@ -106,7 +106,6 @@ public:
 		lines = (switches * param::radix - param::hosts) / 2 + param::hosts;
 		int *s_degree = (int*)malloc(sizeof(int) * switches);
   		int *h_degree = (int*)malloc(sizeof(int) * switches);
-		//int *edge = (int*)malloc(sizeof(int) * lines * 2);
 
 		edges.assign(lines, vector<int>(2, 0));
 		//ORP_Srand(SEED);
@@ -213,7 +212,6 @@ public:
 	void evaluation(void)
 	{
 		//update of degree and adjacency
-		//lines = (switches * param::radix - param::hosts) / 2 + param::hosts;
 		int *edge = (int*)malloc(sizeof(int) * lines * 2);
 		int *adjacency = (int*)malloc(sizeof(int) * switches * param::radix);
 		int *s_degree = (int*)malloc(sizeof(int) * switches);
@@ -291,8 +289,6 @@ public:
 	{
 		for(unsigned int i = 0; i < edges.size(); i++)
 		{
-			//if((edges[i][0] == a || edges[i][1] == a) && (edges[i][0] == b || edges[i][1] == b))
-			//	return true;
 			if((edges[i][0] == a && edges[i][1] == b) || (edges[i][0] == b && edges[i][1] == a))
 				return true;
 		}
