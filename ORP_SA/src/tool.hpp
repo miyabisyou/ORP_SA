@@ -292,3 +292,55 @@ void set_temp(void)
 
   return;
 }
+
+vector <int> check_self_loop(const vector <vector<int>> &edge_table, int s_num)
+{
+	vector <int> sl_edge;
+	for(unsigned int i = param::hosts; i < edge_table.size(); i++)
+	{
+		if(i != s_num)
+		{
+			for(unsigned int j = 0; j < edge_table[i].size(); j++)
+    		{
+      			if(edge_table[i][j] == i)
+	  			{
+        			sl_edge.push_back(i);
+					break;
+				}
+			}
+    	}
+	}
+ 	return sl_edge;
+}
+
+vector <vector<int>> check_double_edge(const vector <vector<int>> &edges, int s_num)
+{
+ 	vector <vector<int>> dl_edge;
+	for(unsigned int i = 0; i < edges.size() - 1; i++)
+	{
+		if(edges[i][0] != s_num && edges[i][1] != s_num)
+		{
+			for(unsigned int j = i + 1; j < edges.size(); j++)
+    		{
+				if(edges[j][0] != s_num && edges[j][1] != s_num && ((edges[j][0] == edges[i][0] && edges[j][1] == edges[i][1]) || (edges[j][0] == edges[i][1] && edges[j][1] == edges[i][0])))
+				{ 
+	  				dl_edge.push_back(vector<int>({edges[i][0], edges[i][1]}));
+					break;
+				}
+				
+			}
+    	}
+	}
+  return dl_edge;
+}
+
+vector <vector<int>> check_stos_edge(const vector <vector<int>> &edges, int s_num)
+{
+	vector <vector<int>> ss_edge;
+	for(unsigned int i = 0; i < edges.size() - 1; i++)
+	{
+		if(edges[i][0] >= param::hosts && edges[i][1] >= param::hosts && edges[i][0] != s_num && edges[i][1] != s_num)
+		ss_edge.push_back(vector<int>({edges[i][0], edges[i][1]}));
+	}
+	return ss_edge;
+}

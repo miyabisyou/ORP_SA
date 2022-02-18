@@ -82,84 +82,189 @@ void reduce_switch(hostswitch &child)
 {
   if((child.switches - 1) * (param::radix - 2) + 2 <= param::hosts)
     return;
-  vector<vector<int>> temp_edges;
-  vector<int> index, ind_val;
-  int f = 1, s_num, aj_count = 0;
-  //decide switch
-  vector <int> label(param::hosts + child.switches, 0);
-  vector <int> ck(param::hosts + child.switches, 0); 
-  for(unsigned int i = param::hosts; i < child.edges.size(); i++)
-  {
-    label[child.edges[i][0]]++;
-    label[child.edges[i][1]]++;
-    if(child.edges[i][0] == child.edges[i][1])
-      ck[child.edges[i][1]]++;
-  }
-  vector <int> aj_label;
-  for(unsigned int i = param::hosts; i < label.size(); i++)
-  {
-    if(label[i] - ck[i] * 2 >= param::radix - label[i])
-      aj_label.push_back(i);
-  }
-  if(aj_label.size() == 0)
-    return;
 
-  shuffle(aj_label.begin(), aj_label.end(), randomseed);
-  do
+  //Select Switch_number
+  int s_num = rand() % child.switches + param::hosts;
+  
+
+  //Generate Edges_table
+  vector <vector<int>> edge_table;
+	edge_table.resize(param::hosts + child.switches);
+	for(unsigned int i = 0; i < child.edges.size(); i++)
+	{
+		edge_table[child.edges[i][0]].push_back(child.edges[i][1]);
+		edge_table[child.edges[i][1]].push_back(child.edges[i][0]);
+	}
+
+  //Count of hosts and switches on the switch
+  vector <int> h_count, s_count;
+  for(unsigned int i = 0; i < edge_table[s_num].size(); i++)
   {
-    index.clear();
-    ind_val.clear();
-    temp_edges.clear();
-    s_num = aj_label[aj_count];
-    int h_count = 0;
-    for(unsigned int i = 0; i < child.edges.size(); i++)
+    if(edge_table[s_num][i] < param::hosts)
+      h_count.push_back(edge_table[s_num][i]);
+    else if(edge_table[s_num][i] != s_num)
+      s_count.push_back(edge_table[s_num][i]);
+  }
+  //cout << "s_num = " << s_num << endl;
+
+  //Generate new edges
+  vector <vector<int>> new_edges;
+  shuffle(h_count.begin(), h_count.end(), randomseed);
+  shuffle(s_count.begin(), s_count.end(), randomseed);
+  if(h_count.size() <= s_count.size())
+  {
+    while(h_count.size() > 0)
     {
-      if(child.edges[i][0] == s_num || child.edges[i][1] == s_num)
+      new_edges.push_back(vector<int>({h_count.back(), s_count.back()}));
+      h_count.pop_back();
+      s_count.pop_back();
+    }
+    while(s_count.size() > 1)
+    {
+      new_edges.push_back(vector<int>({s_count.front(), s_count.back()}));
+      s_count.erase(s_count.begin());
+      s_count.pop_back();
+    }
+    child.check_port();
+    if(s_count.size() == 1 && child.port_f != -1 && child.port_f != s_num)
+      new_edges.push_back(vector<int>({s_count.front(), child.port_f}));
+  }
+  else
+  {
+    while(s_count.size() > 0)
+    {
+      new_edges.push_back(vector<int>({h_count.back(), s_count.back()}));
+      h_count.pop_back();
+      s_count.pop_back();
+    }
+    child.check_port();
+    if(child.port_f != -1 && child.port_f != s_num)
+    {      
+      new_edges.push_back(vector<int>({h_count.back(), child.port_f}));
+      h_count.pop_back();
+    }
+    
+    //connect to bouble edge
+    if(h_count.size() > 0)
+    {
+      unsigned int dl_count = 0;
+      vector <vector<int>> dl_edge = check_double_edge(child.edges, s_num);
+      if(dl_edge.size() > 0)
       {
-        if(child.edges[i][0] != child.edges[i][1])
+        shuffle(dl_edge.begin(), dl_edge.end(), randomseed);
+        while(dl_count < dl_edge.size() && h_count.size() > 1)
         {
-          index.push_back(i);
-          ind_val.push_back(child.edges[i][0] + child.edges[i][1] - s_num);
-          if(ind_val.back() < param::hosts)
-            h_count++;
+          new_edges.push_back(vector<int>({h_count.back(), dl_edge[dl_count][0]}));
+          h_count.pop_back();
+          new_edges.push_back(vector<int>({h_count.back(), dl_edge[dl_count][1]}));
+          h_count.pop_back();
+          dl_count++;
         }
-        else
-          index.push_back(i);
+        if(dl_count < dl_edge.size() && h_count.size() == 1)
+        {
+          new_edges.push_back(vector<int>({h_count.back(), dl_edge[dl_count][0]}));
+          h_count.pop_back();
+          dl_count++;
+        }
+        while(dl_count > 0)
+        {
+          for(unsigned int i = 0; i < child.edges.size(); i++)
+          {
+            if(child.edges[i][0] == dl_edge[dl_count - 1][0] && child.edges[i][1] == dl_edge[dl_count - 1][1])
+            {
+              child.edges.erase(child.edges.begin() + i);
+              break;
+            }
+          }
+          dl_count--;
+        }
       }
     }
-    sort(ind_val.begin(), ind_val.end());
-    shuffle(ind_val.begin() + h_count, ind_val.end(), randomseed);
-    if(ind_val.size() % 2 == 0)
+
+    //connect to self loop
+    if(h_count.size() > 0)
     {
-      for(unsigned int i = 0; i < (int)(ind_val.size() / 2); i++)
-        temp_edges.push_back(vector<int>({ind_val[i], ind_val[ind_val.size() - i - 1]}));
-    }
-    else
-    {
-      //Search for open ports
-      child.check_port();
-      int bias = 1;
-      if(child.port_f != -1)
+      unsigned int sl_count = 0;
+      vector <int> sl_edge = check_self_loop(edge_table, s_num);
+      if(sl_edge.size() > 0)
       {
-        temp_edges.push_back(vector<int>({child.port_f, ind_val.back()}));
-        bias = 2;
+        shuffle(sl_edge.begin(), sl_edge.end(), randomseed);
+        while(sl_count < sl_edge.size() && h_count.size() > 1)
+        {
+          new_edges.push_back(vector<int>({h_count.back(), sl_edge[sl_count]}));
+          h_count.pop_back();
+          new_edges.push_back(vector<int>({h_count.back(), sl_edge[sl_count]}));
+          h_count.pop_back();
+          sl_count++;
+        }
+        if(sl_count < sl_edge.size() && h_count.size() == 1)
+        {
+          new_edges.push_back(vector<int>({h_count.back(), sl_edge[sl_count]}));
+          h_count.pop_back();
+          sl_count++;
+        }
+        while(sl_count > 0)
+        {
+          for(unsigned int i = 0; i < child.edges.size(); i++)
+          {
+            if(child.edges[i][0] == sl_edge[sl_count - 1] && child.edges[i][1] == sl_edge[sl_count - 1])
+            {
+              child.edges.erase(child.edges.begin() + i);
+              break;
+            }
+          }
+          sl_count--;
+        }
       }
-      for(int i = 0; i < (int)(ind_val.size() / 2); i++)
-        temp_edges.push_back(vector<int>({ind_val[i], ind_val[ind_val.size() - i - bias]}));
-      
-      if(child.port_f == ind_val.back())
-        f = 0;
     }
-    aj_count++;
-  }while(f == 0 && aj_count < (int)aj_label.size());
-  if(aj_count == (int)aj_label.size())
-    return;
-  //Mounting of new edges and erase of switch
-  sort(index.begin(), index.end());
-  for(int i = index.size() - 1; i >= 0; i--)
-    child.edges.erase(child.edges.begin() + index[i]);
-  for(unsigned int i = 0; i < temp_edges.size(); i++)
-    child.edges.push_back(temp_edges[i]);
+
+    //Randomly select edges
+    if(h_count.size() > 0)
+    {
+      unsigned int ss_count = 0;
+      vector <vector<int>> ss_edge = check_stos_edge(child.edges, s_num);
+      if(ss_edge.size() > 0)
+      {
+        shuffle(ss_edge.begin(), ss_edge.end(), randomseed);
+        while(h_count.size() > 1)
+        {
+          new_edges.push_back(vector<int>({h_count.back(), ss_edge[ss_count][0]}));
+          h_count.pop_back();
+          new_edges.push_back(vector<int>({h_count.back(), ss_edge[ss_count][1]}));
+          h_count.pop_back();
+          ss_count++;
+        }
+        if(h_count.size() == 1)
+        {
+          new_edges.push_back(vector<int>({h_count.back(), ss_edge[ss_count][0]}));
+          h_count.pop_back();
+          ss_count++;
+        }
+      }
+      while(ss_count > 0)
+      {
+        for(unsigned int i = 0; i < child.edges.size(); i++)
+        {
+          if(child.edges[i][0] == ss_edge[ss_count - 1][0] && child.edges[i][1] == ss_edge[ss_count - 1][1])
+          {
+            child.edges.erase(child.edges.begin() + i);
+            break;
+          }
+        }
+        ss_count--;
+      }
+    }
+  }
+  for(unsigned int i = 0; i < child.edges.size(); i++)
+  {
+    if(child.edges[i][0] == s_num || child.edges[i][1] == s_num)
+    {
+      child.edges.erase(child.edges.begin() + i);
+      i--;
+    }
+  }
+  for(unsigned int i = 0; i < new_edges.size(); i++)
+    child.edges.push_back(new_edges[i]);
   if(s_num != param::hosts + child.switches - 1)
   {
     for(unsigned int i = 0; i < child.edges.size(); i++)
@@ -178,6 +283,8 @@ int n_search_rand(hostswitch &indiv)
 {
   int f = 0;
   f = rand() % 4;
+  //cout  << endl;
+  //cout << f << endl;
   if(f == 0)
     add_switch(indiv);
   else if(f == 1)
@@ -186,7 +293,8 @@ int n_search_rand(hostswitch &indiv)
     swap(indiv);
   else if(f == 3)
     swing(indiv);
-    
+
+  //indiv.show_edges_graph();
   return f;
 }
 

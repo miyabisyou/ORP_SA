@@ -317,10 +317,15 @@ public:
 		}
 		for(unsigned int i = 0; i < temp.size(); i++)
 		{
-			sort(temp[i].begin(), temp[i].end());
-			cout << setw(4) << i << " : "<< setw(4) << temp[i][0];
-			for(unsigned int j = 1; j < temp[i].size(); j++)
-				cout << ", " << setw(4) << temp[i][j];
+			if(temp[i].size() > 0)
+			{
+				sort(temp[i].begin(), temp[i].end());
+				cout << setw(4) << i << " : "<< setw(4) << temp[i][0];
+				for(unsigned int j = 1; j < temp[i].size(); j++)
+					cout << ", " << setw(4) << temp[i][j];
+			}
+			else
+				cout << setw(4) << i << " : ";
 			cout << endl;
 		}
 	}

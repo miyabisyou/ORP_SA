@@ -70,6 +70,9 @@ void sa(hostswitch &indiv)
   
   hostswitch child, best_indiv;
   copy_HS(indiv, best_indiv);   //generate best_invid
+
+  //indiv.show_edges_graph();
+
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
@@ -91,6 +94,9 @@ void sa(hostswitch &indiv)
     if(child.diameter < indiv.diameter || ((child.ASPL <= indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter == indiv.diameter))
     {
       copy_HS(child, indiv);
+
+      //cout << "assept" << endl;
+
       #if GRAPH_LOG == 1
       graph_File << gene + 1 << ", " << indiv.diameter << ", " << indiv.ASPL << ", " << indiv.switches << endl;
       #endif
@@ -98,7 +104,8 @@ void sa(hostswitch &indiv)
     gene++;
     if(gene % param_sa::iteration == 0)
       temperature *= cool_rate;
-    printf("\rGEN:%8d, temperature:%12.6f, switch:%4d", gene, temperature, indiv.switches);
+    printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f", gene, temperature, indiv.switches, indiv.ASPL);
+    //printf("\rGEN:%8d, temperature:%12.6f", gene, temperature);
     fflush(stdout);
 	}
   cout << endl;
