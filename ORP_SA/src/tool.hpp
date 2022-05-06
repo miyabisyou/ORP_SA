@@ -313,7 +313,38 @@ vector <int> check_self_loop(const vector <vector<int>> &edge_table, int s_num)
  	return sl_edge;
 }
 
-vector <vector<int>> check_double_edge(const vector <vector<int>> &edges, int s_num)
+vector <int> check_num_double_edge(const vector <vector<int>> &edges, int s_num)
+{
+	vector <int> num;
+	for(unsigned int i = 0; i < edges.size() - 1; i++)
+	{
+		if(edges[i][0] == s_num || edges[i][1] == s_num)
+		{
+			for(unsigned int j = i + 1; j < edges.size(); j++)
+			{
+				if((edges[j][0] == s_num || edges[j][1] == s_num) && (edges[j][0] + edges[j][1] - s_num == edges[i][0] + edges[i][1] - s_num))
+				{
+					num.push_back(i);
+					break;
+				}
+			}
+		}
+	}
+	return num;
+}
+
+vector <int> check_num_self_loop(const vector <vector<int>> &edges)
+{
+	vector <int> num;
+	for(unsigned int i = 0; i < edges.size(); i++)
+	{
+		if(edges[i][0] == edges[i][1])
+			num.push_back(i);
+	}
+	return num;
+}
+
+vector <vector<int>> check_double_edge(const vector <vector<int>> &edges, int s_num)//Expect for s_num
 {
  	vector <vector<int>> dl_edge;
 	for(unsigned int i = 0; i < edges.size() - 1; i++)
@@ -332,6 +363,27 @@ vector <vector<int>> check_double_edge(const vector <vector<int>> &edges, int s_
     	}
 	}
   return dl_edge;
+}
+
+vector<int> exp_check_num_double_edge(const vector <vector<int>> &edges, int s_num)//Expect for s_num
+{
+ 	vector<int> num;
+	for(unsigned int i = 0; i < edges.size() - 1; i++)
+	{
+		if(edges[i][0] != s_num && edges[i][1] != s_num)
+		{
+			for(unsigned int j = i + 1; j < edges.size(); j++)
+    		{
+				if(edges[j][0] != s_num && edges[j][1] != s_num && ((edges[j][0] == edges[i][0] && edges[j][1] == edges[i][1]) || (edges[j][0] == edges[i][1] && edges[j][1] == edges[i][0])))
+				{ 
+	  				num.push_back(i);
+					break;
+				}
+				
+			}
+    	}
+	}
+  return num;
 }
 
 vector <vector<int>> check_stos_edge(const vector <vector<int>> &edges, int s_num)

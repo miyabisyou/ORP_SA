@@ -77,6 +77,7 @@ void add_switch(hostswitch &child)
   child.lines = (int)child.edges.size();
   
   //reduce multiple edges
+  /*ver 1.0
   vector <vector<int>>mul_edges = check_double_edge(child.edges, s_num);
   if(mul_edges.size() > 0)
   {
@@ -104,7 +105,64 @@ void add_switch(hostswitch &child)
     SAFE_FREE(s_degree);
   	SAFE_FREE(edge);
     SAFE_FREE(adjacency);
+  }*/
+  //ver2.0
+  //child.show_edges();
+  vector <int> mul_edges = check_num_double_edge(child.edges, s_num);
+  /*for(unsigned int i = 0; i < mul_edges.size(); i++)
+    cout << mul_edges[i] << ", ";
+  cout << endl;*/
+  //cout << mul_edges.size() << endl;
+  vector <int> self_loop_num = check_num_self_loop(child.edges); //num = line num of child.edge
+  //cout << self_loop_num.size() << endl;
+  /*for(unsigned int i = 0; i < self_loop_num.size(); i++)
+    cout << self_loop_num[i] << ", ";
+  cout << endl;*/
+  vector <int> another_mul_edges = exp_check_num_double_edge(child.edges, s_num);
+  //cout << self_loop_num.size() << endl;
+  /*for(unsigned int i = 0; i < self_loop_num.size(); i++)
+    cout << self_loop_num[i] << ", ";
+  cout << endl;*/
+  if(mul_edges.size() >= 1)
+  {
+    int p, q, temp;
+    if(self_loop_num.size() >= 1)
+    {
+      p = self_loop_num[rand() % self_loop_num.size()];
+      q = mul_edges[rand() % mul_edges.size()];
+    }
+    else if(mul_edges.size() >= 2)
+    {
+      p = mul_edges[rand() % mul_edges.size()];
+      do{ q = mul_edges[rand() % mul_edges.size()]; }while(p == q);
+    }
+    else if(another_mul_edges.size() >= 1)
+    {
+      p = mul_edges[rand() % mul_edges.size()];
+      q = another_mul_edges[rand() % another_mul_edges.size()];
+    }
+    else
+    {
+      p = mul_edges[rand() % mul_edges.size()];
+      do{ q = rand() % child.lines; }while(p == q);
+    }
+
+    //cout << child.edges[p][0] << ", " << child.edges[p][1] << " <==> " << child.edges[q][0] << ", " << child.edges[q][1] << endl;
+    if(rand() % 2 == 0)
+    {
+      temp = child.edges[p][1];
+      child.edges[p][1] = child.edges[q][1];
+      child.edges[q][1] = temp;  
+    }
+    else
+    {
+      temp = child.edges[p][1];
+      child.edges[p][1] = child.edges[q][0];
+      child.edges[q][0] = temp;
+    }
+    
   }
+
 }
 
 //decrease switch
