@@ -10,12 +10,7 @@ using namespace std;
 #define OFFSET 0
 #define TES 1
 #define SAFE 1000
-
-//GA
-#define GEN 50000
-#define GENTH 10000
-#define POP 1
-#define OFF 1
+#define TYPE 0			//0 -> Random, 1 -> Bias (Add_switch, Remove_switch) 
 
 //SA
 #define MAX_TEMP 400			//初期温度
@@ -26,17 +21,15 @@ using namespace std;
 #define SET_TEMP 1		//0 -> 温度自動設定オフ, 1 -> 温度自動設定オン
 #define SET_TEMP_F true
 
-#define SOLUTION 1		//0 -> GA or HC, 1 -> SA
-#define NSEARCH 0		//0 -> rand, 1 -> each
-
 //TEXT_LOG
-#define GRAPH_LOG 1		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
+#define GRAPH_LOG 0		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
 #define EDGES_OUT 1		//0 -> エッジ出力オフ, 1 -> エッジ出力オン
 #define RESULT_LOG 1	//0 -> 結果出力オフ, 1 -> 結果出力オン
 #define CSV_OUT 1		//0 -> 結果(csv)出力オフ, 1 -> 結果(csv)出力オン
-#define DoNS 1		//0 -> 近傍差出力オフ, 1 -> 近傍差出力オン
-#define Accept_rate 1		//0 -> 受理率出力オフ, 1 -> 受理率出力オン
+#define DoNS 0		//0 -> 近傍差出力オフ, 1 -> 近傍差出力オン
+#define Accept_rate 0		//0 -> 受理率出力オフ, 1 -> 受理率出力オン
 #define NUM_PLOT 100
+#define NUM_OF_SLME 0
 
 namespace param
 {
@@ -44,14 +37,9 @@ namespace param
 	int radix = RADIX;
 	int seed = SEED;
 	int offset = OFFSET;
-
-	int gen = GEN;
-	int genth = GENTH;
-	int pop = POP;
-	int off = OFF;
 	int tes = TES;
 
-	int search_type = NSEARCH;
+	int type = TYPE; 
 }
 
 namespace param_sa
@@ -72,19 +60,12 @@ void output_setting() {
     cout << "offset : " << param::offset << endl;
 	cout << "number of test : " << param::tes << endl;
     cout << "seed : " << param::seed << endl;
-	#if SOLUTION == 0
-    	cout << "max generation count : " << param::gen << endl;
-		cout << "largest institution without renewal : " << param::genth << endl;
-    	cout << "population size : " << param::pop << endl;
-    	cout << "offspring size : " << param::off << endl;
-	#else
-        cout << "max temperature : " << param_sa::temp0 << endl;
-		cout << "min temperature : " << param_sa::tempF << endl;
-    	cout << "cooling rate : " << param_sa::cool_rate << endl;
-    	cout << "number of iterations : " << param_sa::iteration << endl;
-		cout << "number of evaluation calculations : " << fixed << setprecision(0) << param_sa::ncalcs << endl;
-		cout << "auto setting temperature(0 -> off, 1 -> on) : " << param_sa::auto_temp << endl;
-	#endif
-	    cout << "search type(0 -> randam, 1 -> each) : " << param::search_type << std::endl;
-    cout << "-------------------------------" << std::endl;
+    cout << "max temperature : " << param_sa::temp0 << endl;
+	cout << "min temperature : " << param_sa::tempF << endl;
+    cout << "cooling rate : " << param_sa::cool_rate << endl;
+    cout << "number of iterations : " << param_sa::iteration << endl;
+	cout << "number of evaluation calculations : " << fixed << setprecision(0) << param_sa::ncalcs << endl;
+	cout << "auto setting temperature(0 -> off, 1 -> on) : " << param_sa::auto_temp << endl;
+	cout << "Add_switch, Remove_switch(0 -> Random, 1 -> Bias): " << param::type << endl;
+	cout << "-------------------------------" << std::endl;
 }

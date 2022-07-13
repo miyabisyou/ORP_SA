@@ -62,24 +62,6 @@ int ORP_Optimize_switches(const int hosts, const int radix)
 	return s - 1;
 }
 
-
-void intialize(vector<hostswitch> &group)
-{
-	group.resize(param::pop);
-	for (unsigned int i = 0; i < group.size(); i++)
-	{
-		group[i].switches = ORP_Optimize_switches(param::hosts, param::radix) + param::offset; 
-		group[i].Init();
-	}
-
-}
-
-void all_eva(vector<hostswitch> &group)
-{
-	for(unsigned int i = 0; i < group.size(); i++)
-		group[i].evaluation();
-}
-
 void copy_HS(const hostswitch &A, hostswitch &B)//A->B
 {
 	B.switches = A.switches;
@@ -130,58 +112,6 @@ vector<double> ave_dons(const int &f, const vector<vector <double>> &dons)
 	return vector<double>({d_sum / d_count, a_sum / a_count});
 }
 
-void copy_group(const vector<hostswitch> &group, vector<hostswitch> &child_group)
-{
-	if(group.size() >= child_group.size())
-	{
-		for(unsigned int i = 0; i < child_group.size(); i++)
-			copy_HS(group[i], child_group[i]);
-	}
-	else
-	{
-		for(unsigned int i = 0; i < child_group.size(); i++)
-			copy_HS(group[i % group.size()], child_group[i]);
-	}
-}
-void copy_grouptoc(const vector<hostswitch> &group, vector<vector<hostswitch>> &child_group)
-{
-	for(unsigned int i = 0; i < group.size(); i++)
-	{
-		for(unsigned int j = 0; j < child_group[i].size(); j++)
-			copy_HS(group[i], child_group[i][j]);
-	}
-}
-
-void update_group(const vector<vector<hostswitch>> &child_group, vector<hostswitch> &group)
-{
-	for(unsigned int i = 0; i < group.size(); i++)
-		copy_HS(child_group[i][0], group[i]);
-}
-
-void select_child(vector<hostswitch> &group, const vector<vector<hostswitch>> &child_group)
-{
-	vector<hostswitch> temp(param::pop);
-
-
-
-	copy_group(temp, group);
-}
-
-int min_ASPL(const vector<hostswitch> &group)
-{
-	int min;
-	double min_aspl=DBL_MAX;
-	for(unsigned int i = 0; i < group.size(); i++)
-	{
-		if(min_aspl > group[i].ASPL)
-		{
-			min = i;
-			min_aspl = group[i].ASPL;
-		}
-	}
-	return min;
-}
-
 bool comp1(const hostswitch &a, const hostswitch &b)
 {
     return a.ASPL < b.ASPL;
@@ -190,19 +120,6 @@ bool comp2(const hostswitch &a, const hostswitch &b)
 {
     return a.diameter < b.diameter;
 }
-
-void sort_group(vector<hostswitch> &group)
-{
-	sort(group.begin(), group.end(), comp1);
-    sort(group.begin(), group.end(), comp2);
-}
-
-void sort_all(vector<vector<hostswitch>> &child_group)
-{
-	for(unsigned int i = 0; i < child_group.size(); i++)
-		sort_group(child_group[i]);
-}
-
 bool comp3(const vector<int> &edges_a, const vector<int> &edges_b)
 {
 	return edges_a[0] < edges_b[0];
@@ -365,6 +282,23 @@ vector <vector<int>> check_double_edge(const vector <vector<int>> &edges, int s_
   return dl_edge;
 }
 
+vector<int> check_num_of_me(const vector <vector<int>> &edges)
+{
+ 	vector<int> num;
+	for(unsigned int i = 0; i < edges.size() - 1; i++)
+	{
+		for(unsigned int j = i + 1; j < edges.size(); j++)
+   		{
+			if((edges[j][0] == edges[i][0] && edges[j][1] == edges[i][1]) || (edges[j][0] == edges[i][1] && edges[j][1] == edges[i][0]))
+			{ 
+  				num.push_back(j);
+				break;
+			}		
+		}
+	}
+  return num;
+}
+
 vector<int> exp_check_num_double_edge(const vector <vector<int>> &edges, int s_num)//Expect for s_num
 {
  	vector<int> num;
@@ -395,4 +329,113 @@ vector <vector<int>> check_stos_edge(const vector <vector<int>> &edges, int s_nu
 		ss_edge.push_back(vector<int>({edges[i][0], edges[i][1]}));
 	}
 	return ss_edge;
+}
+
+int Num_of_sl(const vector <vector<int>> &edges)
+{
+	int num = 0;
+	for(unsigned int i = 0; i < edges.size(); i++)
+	{
+		if(edges[i][0] == edges[i][1])
+			num++;
+	}
+	return num;
+}
+
+int Num_of_me(const vector <vector<int>> &edges)
+{
+ 	int num = 0;
+	for(unsigned int i = 0; i < edges.size() - 1; i++)
+	{
+		for(unsigned int j = i + 1; j < edges.size(); j++)
+   		{
+			if((edges[j][0] == edges[i][0] && edges[j][1] == edges[i][1]) || (edges[j][0] == edges[i][1] && edges[j][1] == edges[i][0]))
+			{ 
+  				num++;
+				break;
+			}		
+		}
+	}
+  return num;
+}
+
+int RME(vector <vector <int>> &edges, int s_num)
+{
+	//reduce multiple edges
+	//ver2.0
+	vector <int> mul_edges = check_num_double_edge(edges, s_num);
+  	vector <int> self_loop_num = check_num_self_loop(edges); //num = line num of child.edge
+  	vector <int> another_mul_edges = exp_check_num_double_edge(edges, s_num);
+  	if(mul_edges.size() >= 1)
+  	{
+    	int p, q, temp, f = 0;
+    	if(self_loop_num.size() >= 1)
+    	{
+      		p = self_loop_num[rand() % self_loop_num.size()];
+      		q = mul_edges[rand() % mul_edges.size()];
+			f = 1;
+    	}
+    	/*else if(mul_edges.size() >= 2)
+    	{
+      		p = mul_edges[rand() % mul_edges.size()];
+      		do{ q = mul_edges[rand() % mul_edges.size()]; }while(p == q);
+			f = 1;
+    	}
+    	/*else if(another_mul_edges.size() >= 1)
+   		{
+      		p = mul_edges[rand() % mul_edges.size()];
+      		q = another_mul_edges[rand() % another_mul_edges.size()];
+			f = 1;
+    	}*/
+    	/*else
+    	{
+      		p = mul_edges[rand() % mul_edges.size()];
+      		do{ q = rand() % edges.size(); }while(p == q);
+			f = 1;
+    	}*/
+		if(rand() % 2 == 0 && f == 1)
+   		{
+   			temp = edges[p][1];
+      		edges[p][1] = edges[q][1];
+   	  		edges[q][1] = temp;  
+   		}
+    	else if(f == 1)
+   		{
+   			temp = edges[p][1];
+   			edges[p][1] = edges[q][0];
+   			edges[q][0] = temp;
+   		}
+  	}
+	return mul_edges.size();
+}
+
+int select_SLME_num(const vector<vector<int>> &edges, int switches)
+{
+	vector<int> temp(param::hosts + switches, 0), temp2;
+  	for(unsigned int i = param::hosts; i < edges.size() - 1; i++)
+  	{
+    	if(edges[i][0] == edges[i][1])
+      		temp[edges[i][0]]++;
+    	else
+		{
+      		for(unsigned int j = i + 1; j < edges.size(); j++)
+      		{
+        		if((edges[i][0] == edges[j][0] && edges[i][1] == edges[j][1]) || (edges[i][0] == edges[j][1] && edges[i][1] == edges[j][0]))
+        		{
+          			temp[edges[i][0]]++;
+          			temp[edges[i][1]]++;
+          			break;
+        		}
+      		}
+		}
+  	}
+  	int max_slme = *max_element(temp.begin(),temp.end());
+  	for(unsigned int i = param::hosts; i < temp.size(); i++)
+  	{
+    	if(temp[i] == max_slme)
+      	temp2.push_back(i);
+  	}
+  	if(temp2.size() > 1)
+    	shuffle(temp2.begin(), temp2.end(), randomseed);
+  	return temp2[0];
 }

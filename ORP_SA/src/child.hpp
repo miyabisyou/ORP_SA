@@ -30,6 +30,7 @@ extern "C"
 	void ORP_Conv_adjacency2edge(const int hosts, const int switches, const int radix, const int *h_degree, const int *s_degree, const int *adjacency, int *edge);
 	bool ORP_Swap_adjacency_with_one_edge(int hosts, int switches, int radix, int *selected_edge, int *s_degree, ORP_Restore *r, void *adjacency);
 	bool ORP_Swing_adjacency_with_one_edge(int hosts, int switches, int radix, int *selected_edge, int *h_degree, int *s_degree, ORP_Restore *r, void *adjacency);
+	bool ORP_Is_bias();
 }
 
 using namespace std;
@@ -69,6 +70,21 @@ public:
 	long sum;
 	int port_f;
 	ORP_Restore r;
+
+	/*hostswitch()
+	{
+
+	}
+	hostswitch(const hostswitch & host_switch)
+	{
+		switches = host_switch.switches;
+		lines = host_switch.lines;
+		edges = host_switch.edges;
+		port_f = host_switch.port_f;
+		ASPL = host_switch.ASPL;
+		low_ASPL = host_switch.low_ASPL;
+		diameter = host_switch.diameter;
+	}*/
 
 	void Initialize(void)
 	{
@@ -263,20 +279,13 @@ public:
     	}
 		
 		Output_File << "----- settings parameters -----" << endl;
-		#if SOLUTION == 0
-    		Output_File << "max generation count : " << param::gen << endl;
-			Output_File << "largest institution without renewal : " << param::genth << endl;
-    		Output_File << "population size : " << param::pop << endl;
-    		Output_File << "offspring size : " << param::off << endl;
-		#else
-        	Output_File << "max temperature : " << param_sa::temp0 << endl;
-			Output_File << "min temperature : " << param_sa::tempF << endl;
-    		Output_File << "cooling rate : " << param_sa::cool_rate << endl;
-    		Output_File << "number of iterations : " << param_sa::iteration << endl;
-			Output_File << "number of evaluation calculations : " << fixed << setprecision(0) << param_sa::ncalcs << endl;
-			Output_File << "auto setting temperature(0 -> off, 1 -> on) : " << param_sa::auto_temp << endl;
-		#endif
-	    	Output_File << "search type(0 -> randam, 1 -> each) : " << param::search_type << std::endl;
+        Output_File << "max temperature : " << param_sa::temp0 << endl;
+		Output_File << "min temperature : " << param_sa::tempF << endl;
+    	Output_File << "cooling rate : " << param_sa::cool_rate << endl;
+    	Output_File << "number of iterations : " << param_sa::iteration << endl;
+		Output_File << "number of evaluation calculations : " << fixed << setprecision(0) << param_sa::ncalcs << endl;
+		Output_File << "auto setting temperature(0 -> off, 1 -> on) : " << param_sa::auto_temp << endl;
+		
     	Output_File << "-------------------------------" << std::endl;
 		
 		Output_File << "Hosts = " << param::hosts << ", Switches = " << switches << ", Radix = " << param::radix << endl;

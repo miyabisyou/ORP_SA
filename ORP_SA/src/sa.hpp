@@ -67,6 +67,15 @@ void sa(hostswitch &indiv)
     }
     accept_File << ", Add_switch, Reduce_switch, swap, swing" <<endl;
   #endif
+  #if NUM_OF_SLME == 1
+    mkdir("./../SLME", S_IRUSR|S_IWUSR|S_IXUSR);
+	  ofstream slme_File("./../SLME/sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	  if(!slme_File)
+    {
+    	std::cout << "dose not open the slme file." << std::endl;
+    	exit(0);
+    }
+  #endif
 
   double max_temp = param_sa::temp0, min_temp = param_sa::tempF, cool_rate = param_sa::cool_rate;
 	int gene = 0, f;
@@ -88,12 +97,13 @@ void sa(hostswitch &indiv)
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
-    if(param::search_type == 0)
-      f = n_search_rand(child);
-    else
-      f = n_search_each(child);
+    f = n_search(child);
+    
     sort_edges(child);
     child.evaluation();
+    #if NUM_OF_SLME == 1
+      slme_File << gene + 1 << ", " << Num_of_sl(child.edges) << ", " << Num_of_me(child.edges) << endl;
+    #endif
     //Difference of neighborhood solution
     #if DoNS == 1
       dons.push_back(vector<double>({(double)f, (double)child.diameter - indiv.diameter, child.ASPL - indiv.ASPL}));
