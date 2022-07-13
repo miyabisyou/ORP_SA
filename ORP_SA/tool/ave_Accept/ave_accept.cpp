@@ -28,19 +28,19 @@ void set_param(int argc, char * argv[]);
 int main(int argc, char * argv[])
 {
     set_param(argc, argv);
-    ofstream csv_File("comp_host" + to_string(hosts) + "radix" + to_string(radix) + "offset" + to_string(offset) + ".csv");
+    ofstream csv_File("ave_accept_host" + to_string(hosts) + "radix" + to_string(radix) + "offset" + to_string(offset) + ".csv");
 	if(!csv_File)
 	{
 		cout << "dose not open the csv file." << endl;
 		exit(0);
 	}
-    csv_File<< ", Add_switch, , Reduce_switch, , Swap, , Swing" <<endl;
-    csv_File<< "seed, Diameter, ASPL, Diameter, ASPL, Diameter, ASPL, Diameter, ASPL" <<endl;
+    csv_File<< "seed, Add_switch, Reduce_switch, Swap, Swing" <<endl;
 
-    string str;
+    string str, str_buf;
+    int count; 
     for(int i = seed; i < test; i++)
     {
-        string filename = "./../DoNS/(" + to_string(hosts) + ", " + to_string(radix) + ")/sa_ave_host" + to_string(hosts) + "radix" + to_string(radix) + "seed" + to_string(i) + "offset" + to_string(offset) + ".txt";
+        string filename = "./../../Accept/sa_accept_host" + to_string(hosts) + "radix" + to_string(radix) + "seed" + to_string(i) + "offset" + to_string(offset) + ".csv";
         ifstream input_file;
         input_file.open(filename);
         if (input_file.fail())
@@ -48,12 +48,12 @@ int main(int argc, char * argv[])
             cerr << "dose not open the input file. seed : " << i << endl;
             exit(0);
         }
-        //getline(input_file, str);
-        getline(input_file, str);
-        csv_File << str << endl;
-    }
-    
-    csv_File << "AVERAGE,=AVERAGE(B3:B"+ to_string(2 + test) + "),=AVERAGE(C3:C"+ to_string(2 + test) + "),=AVERAGE(D3:D"+ to_string(2 + test) + "),=AVERAGE(E3:E"+ to_string(2 + test) + "),=AVERAGE(F3:F"+ to_string(2 + test) + "),=AVERAGE(G3:G"+ to_string(2 + test) + "),=AVERAGE(H3:H"+ to_string(2 + test) + "),=AVERAGE(I3:I"+ to_string(2 + test) + ")" << endl;
+        while(getline(input_file, str_buf))
+            str = str_buf;
+        str.erase(0, str.find(" ") + 1);
+        csv_File << i << ", " << str << endl;
+    }   
+    csv_File << "AVERAGE,=AVERAGE(B3:B"+ to_string(1 + test) + "),=AVERAGE(C3:C"+ to_string(1 + test) + "),=AVERAGE(D3:D"+ to_string(1 + test) + "),=AVERAGE(E3:E"+ to_string(1 + test) + ")" << endl;
 }
 
 void set_param(int argc, char * argv[]) 

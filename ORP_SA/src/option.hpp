@@ -26,8 +26,8 @@ void set_param(int argc, char * argv[]) {
         -i, --iteration : Number of iterations
         -k, --ncalcs : Number of evaluation calculations
 
-        -y, --searchtype : 0 -> rand, 1 -> each
         -a, --autotemp : 0 -> 温度自動設定オフ, 1 -> 温度自動設定オン
+        -p, --type : 0 -> Random, 1 -> Bias (Add_switch, Remove_switch)
     */
 
     std::map<std::string, std::function<void(std::string)>> settings;
@@ -42,15 +42,6 @@ void set_param(int argc, char * argv[]) {
     settings.emplace("-t", [](std::string args){ param::tes = std::stoi(args); });
     settings.emplace("--test", [](std::string args){ param::tes = std::stoi(args); });
 
-    settings.emplace("-g", [](std::string args){ param::gen = std::stoi(args); });
-    settings.emplace("--generation", [](std::string args){ param::gen = std::stoi(args); });
-    settings.emplace("-l", [](std::string args){ param::genth = std::stoi(args); });
-    settings.emplace("--genth", [](std::string args){ param::genth = std::stoi(args); });
-    settings.emplace("-p", [](std::string args){ param::pop = std::stoi(args); });
-    settings.emplace("--population", [](std::string args){ param::pop = std::stoi(args); });
-    settings.emplace("-c", [](std::string args){ param::off = std::stoi(args); });
-    settings.emplace("--offspring", [](std::string args){ param::off = std::stoi(args); });
-
     settings.emplace("-x", [](std::string args){ param_sa::temp0 = std::stod(args); });
     settings.emplace("--maxtemp", [](std::string args){ param_sa::temp0 = std::stod(args); });
     settings.emplace("-n", [](std::string args){ param_sa::tempF = std::stod(args); });
@@ -62,10 +53,10 @@ void set_param(int argc, char * argv[]) {
     settings.emplace("-k", [](std::string args){ param_sa::ncalcs = std::stoi(args); });
     settings.emplace("--ncalcs", [](std::string args){ param_sa::ncalcs = std::stoi(args); });
 
-    settings.emplace("-y", [](std::string args){ param::search_type = std::stoi(args); });
-    settings.emplace("--searchtype", [](std::string args){ param::search_type = std::stoi(args); });
     settings.emplace("-a", [](std::string args){ param_sa::auto_temp = std::stoi(args); });
     settings.emplace("--autotemp", [](std::string args){ param_sa::auto_temp = std::stoi(args); });
+    settings.emplace("-p", [](std::string args){ param::type = std::stoi(args); });
+    settings.emplace("--type", [](std::string args){ param::type = std::stoi(args); });
 
     for(int i = 1; i < argc; i += 2){
         std::string opt(argv[i]);

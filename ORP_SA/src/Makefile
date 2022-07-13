@@ -11,3 +11,5 @@ clean:
 	rm ./../graph -f -r
 	rm ./../log -f -r
 	rm ./../result -f -r
+	rm ./../Accept -f -r
+	rm ./../SLME -f -r

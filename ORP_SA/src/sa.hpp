@@ -55,6 +55,27 @@ void sa(hostswitch &indiv)
    	  exit(0);
     }
   #endif
+  #if Accept_rate == 1
+    int num_add = 0, num_red = 0, num_swa = 0, num_swi = 0, a_num_add = 0, a_num_red = 0, a_num_swa = 0, a_num_swi = 0;
+    int ave_add = 0, ave_red = 0, ave_swa = 0, ave_swi = 0, ave_count_add = 0, ave_count_red = 0, ave_count_swa = 0, ave_count_swi = 0;
+    mkdir("./../Accept/", S_IRUSR|S_IWUSR|S_IXUSR);
+	  ofstream accept_File("./../Accept/sa_accept_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".csv");
+	  if(!accept_File)
+    {
+  	  std::cout << "dose not open the accept file." << std::endl;
+   	  exit(0);
+    }
+    accept_File << ", Add_switch, Reduce_switch, swap, swing" <<endl;
+  #endif
+  #if NUM_OF_SLME == 1
+    mkdir("./../SLME", S_IRUSR|S_IWUSR|S_IXUSR);
+	  ofstream slme_File("./../SLME/sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	  if(!slme_File)
+    {
+    	std::cout << "dose not open the slme file." << std::endl;
+    	exit(0);
+    }
+  #endif
 
   double max_temp = param_sa::temp0, min_temp = param_sa::tempF, cool_rate = param_sa::cool_rate;
 	int gene = 0, f;
@@ -70,15 +91,19 @@ void sa(hostswitch &indiv)
   
   hostswitch child, best_indiv;
   copy_HS(indiv, best_indiv);   //generate best_invid
+
+  //indiv.show_edges_graph();
+
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
-    if(param::search_type == 0)
-      f = n_search_rand(child);
-    else
-      f = n_search_each(child);
+    f = n_search(child);
+    
     sort_edges(child);
     child.evaluation();
+    #if NUM_OF_SLME == 1
+      slme_File << gene + 1 << ", " << Num_of_sl(child.edges) << ", " << Num_of_me(child.edges) << endl;
+    #endif
     //Difference of neighborhood solution
     #if DoNS == 1
       dons.push_back(vector<double>({(double)f, (double)child.diameter - indiv.diameter, child.ASPL - indiv.ASPL}));
@@ -87,20 +112,86 @@ void sa(hostswitch &indiv)
     if(child.diameter < best_indiv.diameter || (child.diameter == best_indiv.diameter && child.ASPL < best_indiv.ASPL))
       copy_HS(child, best_indiv);
     //accept
+    #if Accept_rate == 1
+      if(f == 0)
+      {
+        num_add++;
+        ave_count_add++;
+      }
+      //else if(f == 1 || f == -1)
+      else if(f == 1)
+      {
+        num_red++;
+        ave_count_red++;
+      }        
+      else if(f == 2)
+      {
+        num_swa++;
+        ave_count_swa++;
+      }        
+      else if(f == 3)
+      {
+        num_swi++;
+        ave_count_swi++;
+      }        
+    #endif
     //if((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter <= indiv.diameter)
     if(child.diameter < indiv.diameter || ((child.ASPL <= indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter == indiv.diameter))
     {
       copy_HS(child, indiv);
+
       #if GRAPH_LOG == 1
-      graph_File << gene + 1 << ", " << indiv.diameter << ", " << indiv.ASPL << ", " << indiv.switches << endl;
+        graph_File << gene + 1 << ", " << indiv.diameter << ", " << indiv.ASPL << ", " << indiv.switches << endl;
+      #endif
+      #if Accept_rate == 1
+        if(f == 0)
+        {
+          a_num_add++;
+          ave_add++;
+        }
+        else if(f == 1)
+        {
+          a_num_red++;
+          ave_red++;
+        }          
+        else if(f == 2)
+        {
+          a_num_swa++;
+          ave_swa++;
+        }          
+        else if(f == 3)
+        {
+          a_num_swi++;
+          ave_swi++;
+        }          
       #endif
     }
+    #if Accept_rate == 1
+      if((gene + 1) % (int)(param_sa::ncalcs / NUM_PLOT) == 0)
+      {
+        //cout << a_num_red << ", " << (double)num_red << endl;
+        accept_File << gene + 1 << ", " << a_num_add / (double)num_add * 100 << ", " << a_num_red / (double)num_red * 100 << ", " << a_num_swa / (double)num_swa * 100 << ", " << a_num_swi / (double)num_swi * 100 << endl;
+        a_num_add = 0;
+        a_num_red = 0;
+        a_num_swa = 0;
+        a_num_swi = 0;
+        num_add = 0;
+        num_red = 0;
+        num_swa = 0;
+        num_swi = 0;
+      }
+    #endif
+    
     gene++;
     if(gene % param_sa::iteration == 0)
       temperature *= cool_rate;
-    printf("\rGEN:%8d, temperature:%12.6f, switch:%4d", gene, temperature, indiv.switches);
+    printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f", gene, temperature, indiv.switches, indiv.ASPL);
+    //printf("\rGEN:%8d, temperature:%12.6f", gene, temperature);
     fflush(stdout);
 	}
+  #if Accept_rate == 1
+    accept_File << "AVERAGE, " << ave_add / (double)ave_count_add * 100 << ", " << ave_red / (double)ave_count_red * 100 << ", " << ave_swa / (double)ave_count_swa * 100 << ", " << ave_swi / (double)ave_count_swi * 100 << endl;
+  #endif
   cout << endl;
   copy_HS(best_indiv, indiv);
   indiv.evaluation();
