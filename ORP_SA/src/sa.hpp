@@ -92,8 +92,6 @@ void sa(hostswitch &indiv)
   hostswitch child, best_indiv;
   copy_HS(indiv, best_indiv);   //generate best_invid
 
-  //indiv.show_edges_graph();
-
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
@@ -135,7 +133,6 @@ void sa(hostswitch &indiv)
         ave_count_swi++;
       }        
     #endif
-    //if((child.ASPL < indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter <= indiv.diameter)
     if(child.diameter < indiv.diameter || ((child.ASPL <= indiv.ASPL || Fx_A(indiv.ASPL - child.ASPL, temperature, child.switches) >= (double)rand()/RAND_MAX) && child.diameter == indiv.diameter))
     {
       copy_HS(child, indiv);
@@ -169,7 +166,6 @@ void sa(hostswitch &indiv)
     #if Accept_rate == 1
       if((gene + 1) % (int)(param_sa::ncalcs / NUM_PLOT) == 0)
       {
-        //cout << a_num_red << ", " << (double)num_red << endl;
         accept_File << gene + 1 << ", " << a_num_add / (double)num_add * 100 << ", " << a_num_red / (double)num_red * 100 << ", " << a_num_swa / (double)num_swa * 100 << ", " << a_num_swi / (double)num_swi * 100 << endl;
         a_num_add = 0;
         a_num_red = 0;
@@ -186,7 +182,6 @@ void sa(hostswitch &indiv)
     if(gene % param_sa::iteration == 0)
       temperature *= cool_rate;
     printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f", gene, temperature, indiv.switches, indiv.ASPL);
-    //printf("\rGEN:%8d, temperature:%12.6f", gene, temperature);
     fflush(stdout);
 	}
   #if Accept_rate == 1
@@ -215,7 +210,6 @@ void sa(hostswitch &indiv)
   {
     vector<double> temp;
     temp = ave_dons(i, dons);
-    //ave_File << i << " : " << setprecision(10) << temp[0] << ", " << setprecision(10) << temp[1] << endl;
     ave_File << ", " << setprecision(10) << temp[0] << ", " << setprecision(10) << temp[1];
   }
   ave_File << endl;

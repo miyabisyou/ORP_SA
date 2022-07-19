@@ -108,7 +108,6 @@ vector<double> ave_dons(const int &f, const vector<vector <double>> &dons)
 			}
 		}
 	#endif
-	//cout << d_sum << ", " << d_count << ", "  << a_sum << ", "  << a_count <<endl;
 	return vector<double>({d_sum / d_count, a_sum / a_count});
 }
 
@@ -375,24 +374,24 @@ int RME(vector <vector <int>> &edges, int s_num)
       		q = mul_edges[rand() % mul_edges.size()];
 			f = 1;
     	}
-    	/*else if(mul_edges.size() >= 2)
+    	else if(mul_edges.size() >= 2)
     	{
       		p = mul_edges[rand() % mul_edges.size()];
       		do{ q = mul_edges[rand() % mul_edges.size()]; }while(p == q);
 			f = 1;
     	}
-    	/*else if(another_mul_edges.size() >= 1)
+    	else if(another_mul_edges.size() >= 1)
    		{
       		p = mul_edges[rand() % mul_edges.size()];
       		q = another_mul_edges[rand() % another_mul_edges.size()];
 			f = 1;
-    	}*/
-    	/*else
+    	}
+    	else
     	{
       		p = mul_edges[rand() % mul_edges.size()];
       		do{ q = rand() % edges.size(); }while(p == q);
 			f = 1;
-    	}*/
+    	}
 		if(rand() % 2 == 0 && f == 1)
    		{
    			temp = edges[p][1];

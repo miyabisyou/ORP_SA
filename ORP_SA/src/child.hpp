@@ -71,21 +71,6 @@ public:
 	int port_f;
 	ORP_Restore r;
 
-	/*hostswitch()
-	{
-
-	}
-	hostswitch(const hostswitch & host_switch)
-	{
-		switches = host_switch.switches;
-		lines = host_switch.lines;
-		edges = host_switch.edges;
-		port_f = host_switch.port_f;
-		ASPL = host_switch.ASPL;
-		low_ASPL = host_switch.low_ASPL;
-		diameter = host_switch.diameter;
-	}*/
-
 	void Initialize(void)
 	{
 		int f, k;
@@ -135,25 +120,6 @@ public:
 		SAFE_FREE(h_degree);
 		SAFE_FREE(s_degree);
 	}
-
-	/*void Init(string filename)
-	{
-		ifstream input_file("./../input/" + filname);
-		if(!input_File)
-    	{
-        	std::cout << "dose not open the input file." << std::endl;
-        	exit(0);
-    	}
-
-		string str, ss1, ss2;
-		vecter<int> temp; 
-		getline(input_file, str);
-		ss1 = str.substr(str.find(' ') + 1, str.rfind(' ') - str.find(' ') - 1);
-		switches = temp[1];
-		while(getline(input_file, str)){
-			
-		}
-	}*/
 
 	void print_eva(void)
 	{

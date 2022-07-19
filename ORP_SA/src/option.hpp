@@ -14,11 +14,6 @@ void set_param(int argc, char * argv[]) {
         -o, --offset : make a bias in the number of switches
         -s, --seed : seed value
         -t, --test : number of test
-        
-        -g, --generation : max generation count
-        -l, --genth : Largest institution without renewal
-        -p, --population : population size or particle size
-        -c, --offspring : offspring size
 
         -x, --maxtemp : max temperature
         -n, --mintemp : min temperature
