@@ -1,9 +1,12 @@
-host = "32"
-radix = "4"
+host = "8"
+radix = "3"
 seed = "0"
+off = "0"
+switch_bias = "bias"
+swing_bias = "random"
 
-fnameone = "sa_host".host."radix".radix."seed".seed."offset0"
-titlename = "AdaptiveSA(".host.", ".radix.")"
+fnameone = "sa_host".host."radix".radix."seed".seed."offset".off."switch(".switch_bias.")swing(".swing_bias.")"
+titlename = "AdaptiveSA(".host.", ".radix.") switch(".switch_bias.")swing(".swing_bias.")"
 fnametwo = "sa"
  
 set title titlename

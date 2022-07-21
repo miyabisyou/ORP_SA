@@ -23,14 +23,14 @@ using namespace std;
 #define DISPLAY 1
 
 //TEXT_LOG
-#define GRAPH_LOG 0		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
+#define GRAPH_LOG 1		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
 #define EDGES_OUT 1		//0 -> エッジ出力オフ, 1 -> エッジ出力オン
 #define RESULT_LOG 1	//0 -> 結果出力オフ, 1 -> 結果出力オン
 #define CSV_OUT 1		//0 -> 結果(csv)出力オフ, 1 -> 結果(csv)出力オン
-#define DoNS 0		//0 -> 近傍差出力オフ, 1 -> 近傍差出力オン
-#define Accept_rate 0		//0 -> 受理率出力オフ, 1 -> 受理率出力オン
+#define DoNS 1		//0 -> 近傍差出力オフ, 1 -> 近傍差出力オン
+#define Accept_rate 1		//0 -> 受理率出力オフ, 1 -> 受理率出力オン
 #define NUM_PLOT 100
-#define NUM_OF_SLME 0		//自己ループ辺数と多重辺数の遷移出力 0 -> オフ, 1 -> オン
+#define NUM_OF_SLME 1		//自己ループ辺数と多重辺数の遷移出力 0 -> オフ, 1 -> オン
 
 namespace param
 {

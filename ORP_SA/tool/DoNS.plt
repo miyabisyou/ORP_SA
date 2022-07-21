@@ -1,10 +1,13 @@
-host = "128"
-radix = "24"
+host = "8"
+radix = "3"
 seed = "0"
 type = "reduce"
+off = "0"
+switch_bias = "bias"
+swing_bias = "random"
 
-fnameone = "./../DoNS/(".host.", ".radix.")/sa_".type."_host".host."radix".radix."seed".seed."offset0"
-titlename = "AdaptiveSA(".host.", ".radix.") ".type
+fnameone = "./../DoNS/(".host.", ".radix.")/".type."_sa_host".host."radix".radix."seed".seed."offset".off."switch(".switch_bias.")swing(".swing_bias.")"
+titlename = "AdaptiveSA(".host.", ".radix.") ".type." switch(".switch_bias.")swing(".swing_bias.")"
 fnametwo = "sa"
  
 set title titlename
@@ -24,5 +27,5 @@ set tics font "Arial,11"
 set key font"Arial,11"
 plot fnameone.".txt" using 1:2 axis x1y1 title "diameta" w l, fnameone.".txt" using 1:3 axis x1y2 title "ASPL" w l
 set terminal png
-set out "./photo/sa_".type."_host".host."radix".radix."seed".seed."offset0.png"
+set out "./photo/sa_".type."_host".host."radix".radix."seed".seed."offset".off."switch(".switch_bias.")swing(".swing_bias.").png"
 replot
