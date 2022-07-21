@@ -13,7 +13,7 @@ void sa(hostswitch &indiv)
 {
   #if GRAPH_LOG == 1
     mkdir("./../graph", S_IRUSR|S_IWUSR|S_IXUSR);
-	  ofstream graph_File("./../graph/sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	  ofstream graph_File("./../graph/" + param_sa::fname + ".txt");
 	  if(!graph_File)
     {
     	std::cout << "dose not open the graph file." << std::endl;
@@ -24,31 +24,31 @@ void sa(hostswitch &indiv)
     mkdir("./../DoNS", S_IRUSR|S_IWUSR|S_IXUSR);
     string name = "./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")";
     mkdir(name.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
-	  ofstream add_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/sa_add_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	  ofstream add_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/add_" + param_sa::fname + ".txt");
 	  if(!add_File)
     {
   	  std::cout << "dose not open the add file." << std::endl;
    	  exit(0);
     }
-    ofstream reduce_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/sa_reduce_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+    ofstream reduce_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/reduce_" + param_sa::fname + ".txt");
 	  if(!reduce_File)
     {
     	std::cout << "dose not open the reduce file." << std::endl;
    	  exit(0);
     }
-    ofstream swap_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/sa_swap_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+    ofstream swap_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/swap_" + param_sa::fname + ".txt");
 	  if(!swap_File)
     {
     	std::cout << "dose not open the swap file." << std::endl;
    	  exit(0);
     }
-    ofstream swing_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/sa_swing_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+    ofstream swing_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/swing_" + param_sa::fname + ".txt");
 	  if(!swing_File)
     {
     	std::cout << "dose not open the swing file." << std::endl;
      	exit(0);
     }
-    ofstream ave_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/sa_ave_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+    ofstream ave_File("./../DoNS/(" + to_string(param::hosts) + ", " + to_string(param::radix) + ")/ave_" + param_sa::fname + ".txt");
 	  if(!ave_File)
     {
     	std::cout << "dose not open the ave file." << std::endl;
@@ -59,7 +59,7 @@ void sa(hostswitch &indiv)
     int num_add = 0, num_red = 0, num_swa = 0, num_swi = 0, a_num_add = 0, a_num_red = 0, a_num_swa = 0, a_num_swi = 0;
     int ave_add = 0, ave_red = 0, ave_swa = 0, ave_swi = 0, ave_count_add = 0, ave_count_red = 0, ave_count_swa = 0, ave_count_swi = 0;
     mkdir("./../Accept/", S_IRUSR|S_IWUSR|S_IXUSR);
-	  ofstream accept_File("./../Accept/sa_accept_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".csv");
+	  ofstream accept_File("./../Accept/accept_" + param_sa::fname + ".csv");
 	  if(!accept_File)
     {
   	  std::cout << "dose not open the accept file." << std::endl;
@@ -69,7 +69,7 @@ void sa(hostswitch &indiv)
   #endif
   #if NUM_OF_SLME == 1
     mkdir("./../SLME", S_IRUSR|S_IWUSR|S_IXUSR);
-	  ofstream slme_File("./../SLME/sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".txt");
+	  ofstream slme_File("./../SLME/" + param_sa::fname + ".txt");
 	  if(!slme_File)
     {
     	std::cout << "dose not open the slme file." << std::endl;
@@ -181,8 +181,11 @@ void sa(hostswitch &indiv)
     gene++;
     if(gene % param_sa::iteration == 0)
       temperature *= cool_rate;
-    printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f", gene, temperature, indiv.switches, indiv.ASPL);
-    fflush(stdout);
+    if(param_sa::display != 0 && gene % param_sa::display == 0)
+    {
+      printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f", gene, temperature, indiv.switches, indiv.ASPL);
+      fflush(stdout);
+    }  
 	}
   #if Accept_rate == 1
     accept_File << "AVERAGE, " << ave_add / (double)ave_count_add * 100 << ", " << ave_red / (double)ave_count_red * 100 << ", " << ave_swa / (double)ave_count_swa * 100 << ", " << ave_swi / (double)ave_count_swi * 100 << endl;

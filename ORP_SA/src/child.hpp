@@ -219,10 +219,10 @@ public:
 		SAFE_FREE(edge);
 	}
 
-	void output(string filename)
+	void output(void)
 	{
 		mkdir("./../result", S_IRUSR|S_IWUSR|S_IXUSR);
-		ofstream Output_File("./../result/" + filename + ".edges");
+		ofstream Output_File("./../result/" + param_sa::fname + ".edges");
 		if(!Output_File)
     	{
         	std::cout << "dose not open the output file." << std::endl;
@@ -234,10 +234,10 @@ public:
 			Output_File << edges[i][0] << " " << edges[i][1] << endl;
 	}
 
-	void outputlog(string filename, double time)
+	void outputlog(double time)
 	{
 		mkdir("./../log", S_IRUSR|S_IWUSR|S_IXUSR);
-		ofstream Output_File("./../log/" + filename + ".logs");
+		ofstream Output_File("./../log/" + param_sa::fname + ".logs");
 		if(!Output_File)
     	{
         	std::cout << "dose not open the log file." << std::endl;

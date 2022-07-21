@@ -32,6 +32,7 @@ Order/Radix Problem(ORP)において最小の直径(Diameter)と平均ホスト�
 
     -a, --autotemp : 0 -> 温度自動設定オフ, 1 -> 温度自動設定オン
     -p, --type : 0 -> Random, 1 -> Bias (Add_switch, Remove_switch)
+    -d, --display : Display of the number of calculations(0 -> nothing, 1 -> Number of evaluation calculations times, anather -> Number of evaluation calculations / d times)
 
 #実行環境
 

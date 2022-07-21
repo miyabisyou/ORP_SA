@@ -20,6 +20,7 @@ using namespace std;
 #define NCALCS 1000000		//計算回数(if don't used this value is -1)
 #define SET_TEMP 1		//0 -> 温度自動設定オフ, 1 -> 温度自動設定オン
 #define SET_TEMP_F true
+#define DISPLAY 1
 
 //TEXT_LOG
 #define GRAPH_LOG 0		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
@@ -29,7 +30,7 @@ using namespace std;
 #define DoNS 0		//0 -> 近傍差出力オフ, 1 -> 近傍差出力オン
 #define Accept_rate 0		//0 -> 受理率出力オフ, 1 -> 受理率出力オン
 #define NUM_PLOT 100
-#define NUM_OF_SLME 0
+#define NUM_OF_SLME 0		//自己ループ辺数と多重辺数の遷移出力 0 -> オフ, 1 -> オン
 
 namespace param
 {
@@ -51,6 +52,9 @@ namespace param_sa
 	double ncalcs = NCALCS;
 	//double cool_rate = pow(MIN_TEMP / MAX_TEMP, (double)1.0 / NCALCS * iteration);
 	int auto_temp = SET_TEMP;
+	int display = DISPLAY;
+
+	string fname = "sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset);
 }
 
 void output_setting() {

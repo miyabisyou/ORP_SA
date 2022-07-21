@@ -23,6 +23,7 @@ void set_param(int argc, char * argv[]) {
 
         -a, --autotemp : 0 -> 温度自動設定オフ, 1 -> 温度自動設定オン
         -p, --type : 0 -> Random, 1 -> Bias (Add_switch, Remove_switch)
+        -d, --display : Display of the number of calculations(0 -> nothing, 1 -> Number of evaluation calculations times, anather -> Number of evaluation calculations / d times)
     */
 
     std::map<std::string, std::function<void(std::string)>> settings;
@@ -52,6 +53,8 @@ void set_param(int argc, char * argv[]) {
     settings.emplace("--autotemp", [](std::string args){ param_sa::auto_temp = std::stoi(args); });
     settings.emplace("-p", [](std::string args){ param::type = std::stoi(args); });
     settings.emplace("--type", [](std::string args){ param::type = std::stoi(args); });
+    settings.emplace("-d", [](std::string args){ param_sa::display = std::stoi(args); });
+    settings.emplace("--display", [](std::string args){ param_sa::display = std::stoi(args); });
 
     for(int i = 1; i < argc; i += 2){
         std::string opt(argv[i]);
@@ -64,5 +67,11 @@ void set_param(int argc, char * argv[]) {
         set_temp();
     if(param_sa::ncalcs != -1)
         param_sa::cool_rate = pow(param_sa::tempF / param_sa::temp0, (double)1.0 / param_sa::ncalcs * param_sa::iteration);
+}
 
+void set_fname(void)
+{
+    string temp =  param::type == 0 ? "(random)" : "(bias)";
+    string temp2 = ORP_Is_bias()? "(bias)" : "(random)";
+    param_sa::fname = "sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + "switch" + temp + "swing" + temp2;
 }

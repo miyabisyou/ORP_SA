@@ -17,7 +17,8 @@ int main(int argc, char * argv[])
 	output_setting();
 	#if CSV_OUT == 1
 		mkdir("./../CSV", S_IRUSR|S_IWUSR|S_IXUSR);
-		ofstream csv_File("./../CSV/sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset) + ".csv");
+		set_fname();
+		ofstream csv_File("./../CSV/" + param_sa::fname + ".csv");
 		if(!csv_File)
 		{
 			std::cout << "dose not open the csv file." << std::endl;
@@ -35,14 +36,14 @@ int main(int argc, char * argv[])
 		hostswitch indiv;
 		indiv.switches = ORP_Optimize_switches(param::hosts, param::radix) + param::offset; 
 		indiv.Init();
+		set_fname();
 		sa(indiv);
-		string fname = "sa_host" + to_string(param::hosts) + "radix" + to_string(param::radix) + "seed" + to_string(param::seed) + "offset" + to_string(param::offset);
 		clock_t end = clock();
 		#if EDGES_OUT == 1
-			indiv.output(fname);
+			indiv.output();
 		#endif
 		#if RESULT_LOG == 1
-			indiv.outputlog(fname, (double)(end - start) / CLOCKS_PER_SEC);
+			indiv.outputlog((double)(end - start) / CLOCKS_PER_SEC);
 		#endif
 		#if CSV_OUT == 1
 			csv_File << param::seed << ", " << indiv.diameter << ", " << indiv.diameter - indiv.low_diameter << ", " << setprecision(10) << indiv.ASPL << ", " << setprecision(10) << indiv.ASPL - indiv.low_ASPL << ", " << indiv.switches << ", " << (double)(end - start) / CLOCKS_PER_SEC << endl;
