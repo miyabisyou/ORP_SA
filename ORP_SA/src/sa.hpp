@@ -80,6 +80,7 @@ void sa(hostswitch &indiv)
   double max_temp = param_sa::temp0, min_temp = param_sa::tempF, cool_rate = param_sa::cool_rate;
 	int gene = 0, f;
   double temperature = max_temp;
+  int last_switches, count_switches = 0, sw_f = 0; //switching
   vector<vector <double>> dons;
 	//evaluation
 	indiv.evaluation();
@@ -92,11 +93,16 @@ void sa(hostswitch &indiv)
   hostswitch child, best_indiv;
   copy_HS(indiv, best_indiv);   //generate best_invid
 
+  last_switches = indiv.switches;
+
 	while (temperature > min_temp)
 	{
     copy_HS(indiv, child);
-    f = n_search(child);
-    
+    if(sw_f == 0)
+      f = n_search(child);
+    else
+      f = n_search_exc(child);
+
     sort_edges(child);
     child.evaluation();
     #if NUM_OF_SLME == 1
@@ -177,13 +183,26 @@ void sa(hostswitch &indiv)
         num_swi = 0;
       }
     #endif
+
+    //switching
+    ///*
+    if(last_switches == indiv.switches)
+      count_switches++;
+    else
+    {
+      last_switches = indiv.switches;
+      count_switches = 0;  
+    }
+    if(count_switches >= param_sa::ncalcs * SWITCHING)
+      sw_f = 1;//*/
     
     gene++;
     if(gene % param_sa::iteration == 0)
       temperature *= cool_rate;
     if(param_sa::display != 0 && gene % param_sa::display == 0)
     {
-      printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f", gene, temperature, indiv.switches, indiv.ASPL);
+      //printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f", gene, temperature, indiv.switches, indiv.ASPL);
+      printf("\rGEN:%8d, temperature:%12.6f, switch:%4d, ASPL:%12.6f, sw_f:%d", gene, temperature, indiv.switches, indiv.ASPL, sw_f);
       fflush(stdout);
     }  
 	}
