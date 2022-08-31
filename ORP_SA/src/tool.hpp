@@ -438,3 +438,29 @@ int select_SLME_num(const vector<vector<int>> &edges, int switches)
     	shuffle(temp2.begin(), temp2.end(), randomseed);
   	return temp2[0];
 }
+
+int select_fewhost_num(const vector<vector<int>> &edges, int switches)
+{
+	int s_num = -1;
+	vector<int> num_host;
+	num_host.resize(param::hosts + switches);
+	for(int i = 0; i < param::hosts; i++)
+		num_host[edges[i][1]]++;	//スイッチごとのホストの数を数える
+
+	vector<vector<int>> num_hostlist;
+	num_hostlist.resize(param::radix);
+	for(unsigned int i = param::hosts; i < num_host.size(); i++)
+		num_hostlist[num_host[i]].push_back(i);
+
+	for(unsigned int i = 1; i < num_hostlist.size(); i++)
+	{
+		if(num_hostlist[i].size() >= 1)
+		{
+			s_num = num_hostlist[i][rand() % num_hostlist[i].size()];
+			break;
+		}
+	}
+	if(s_num == -1)
+		s_num = rand() % switches + param::hosts;
+	return s_num;
+}

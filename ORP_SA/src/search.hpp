@@ -62,7 +62,9 @@ void add_switch(hostswitch &child)
   }
   else
   {
-    vector<int> temp;
+    for(unsigned int i = 0; i < param::hosts; i++)
+      label.push_back(i);
+    /*vector<int> temp;
     temp = check_num_of_me(child.edges);
     label = temp;
     temp = check_num_self_loop(child.edges);
@@ -93,7 +95,7 @@ void add_switch(hostswitch &child)
       if(temp.size() > 1)
         shuffle(temp.begin(), temp.end(), randomseed);
       label.insert(label.end(), temp.begin(), temp.begin() + param::radix / 2 - label.size());
-    }
+    }*/
   }
   shuffle(label.begin(), label.end(), randomseed);
 
@@ -122,7 +124,8 @@ void remove_switch(hostswitch &child)
   if(param::type == 0)
     s_num = rand() % child.switches + param::hosts;
   else
-    s_num = select_SLME_num(child.edges, child.switches);
+    s_num = select_fewhost_num(child.edges, child.switches);
+    //s_num = select_SLME_num(child.edges, child.switches);
 
   //Count of hosts and switches on the switch
   vector <int> h_count, s_count;
