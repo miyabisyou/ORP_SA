@@ -55,12 +55,12 @@ int main(int argc, char * argv[])
         input_file.open(filename);
         if (input_file.fail())
         {
-            cerr << "dose not open the input file.\nfilname : " << fname << endl;
+            cerr << "dose not open the input file.\nfilename : " << fname << endl;
             exit(0);
         }
         getline(input_file, str);
         while(getline(input_file, str))
-            csv_File << str << endl;
+            csv_File << str << endl;   
     }
     csv_File << "AVERAGE,=AVERAGE(B2:B"+ to_string(1 + noi) + "),=AVERAGE(C2:C"+ to_string(1 + noi) + "),=AVERAGE(D2:D"+ to_string(1 + noi) + "),=AVERAGE(E2:E"+ to_string(1 + noi) + "),=AVERAGE(F2:F"+ to_string(1 + noi) + "),=AVERAGE(G2:G"+ to_string(1 + noi)  + ")" << endl;
 }

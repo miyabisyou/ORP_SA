@@ -21,9 +21,10 @@ using namespace std;
 #define SET_TEMP 1		//0 -> 温度自動設定オフ, 1 -> 温度自動設定オン
 #define SET_TEMP_F true
 #define DISPLAY 1
+#define SWITCHING 0.05			//計算回数*SWITCHING回スイッチの変化がない場合AddとRemoveを行わない
 
 //TEXT_LOG
-#define GRAPH_LOG 0		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
+#define GRAPH_LOG 1		//0 -> グラフ出力オフ, 1 -> グラフ出力オン
 #define EDGES_OUT 1		//0 -> エッジ出力オフ, 1 -> エッジ出力オン
 #define RESULT_LOG 1	//0 -> 結果出力オフ, 1 -> 結果出力オン
 #define CSV_OUT 1		//0 -> 結果(csv)出力オフ, 1 -> 結果(csv)出力オン

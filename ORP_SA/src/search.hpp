@@ -291,3 +291,14 @@ int n_search(hostswitch &indiv)
     swing(indiv);
   return f;
 }
+
+int n_search_exc(hostswitch &indiv)
+{
+  int f = 0;
+  f = rand() % 2;
+  if(f == 0)
+    swap(indiv);
+  else if(f == 1)
+    swing(indiv);
+  return f;
+}
