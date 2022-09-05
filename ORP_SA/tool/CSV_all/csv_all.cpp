@@ -44,8 +44,10 @@ int main(int argc, char * argv[])
 		cout << "dose not open the csv file." << endl;
 		exit(0);
 	}
-    csv_File <<"Seed, Diametar, Diameter Gap, ASPL, ASPL Gap, switches, computing-time(sec.)" << endl; 
-    
+    csv_File <<"Seed, Diametar, Diameter Gap, ASPL, ASPL Gap, switches, computing-time(sec.)" << endl;
+    csv_File << "\"=INDEX(A4:A" << noi + 3 << ",MATCH(D2,D4:D" << noi + 3 << ",0))\",\"=INDEX(B4:B" << noi + 3 << ",MATCH(D2,D4:D" << noi + 3 << ",0))\",\"=INDEX(C4:C" << noi + 3 << ",MATCH(D2,D4:D" << noi + 3 << ",0))\",=MIN(D4:D" << noi + 3 << "),\"=INDEX(E4:E" << noi + 3 << ",MATCH(D2,D4:D" << noi + 3 << ",0))\",\"=INDEX(F4:F" << noi + 3 << ",MATCH(D2,D4:D" << noi + 3 << ",0))\",\"=INDEX(G4:G" << noi + 3 << ",MATCH(D2,D4:D" << noi + 3 << ",0))\", BEST" << endl;
+    csv_File << "=AVERAGE(A4:A" << noi + 3 << "),=AVERAGE(B4:B" << noi + 3 << "),=AVERAGE(C4:C" << noi + 3 << "),=AVERAGE(D4:D" << noi + 3 << "),=AVERAGE(E4:E" << noi + 3 << "),=AVERAGE(F4:F" << noi + 3 << "),=AVERAGE(G4:G" << noi + 3 << "),AVERAGE" << endl;
+
     string str;
     for(int i = 0; i < noi; i += test)
     {
@@ -59,10 +61,11 @@ int main(int argc, char * argv[])
             exit(0);
         }
         getline(input_file, str);
+        getline(input_file, str);
+        getline(input_file, str);
         while(getline(input_file, str))
             csv_File << str << endl;   
     }
-    csv_File << "AVERAGE,=AVERAGE(B2:B"+ to_string(1 + noi) + "),=AVERAGE(C2:C"+ to_string(1 + noi) + "),=AVERAGE(D2:D"+ to_string(1 + noi) + "),=AVERAGE(E2:E"+ to_string(1 + noi) + "),=AVERAGE(F2:F"+ to_string(1 + noi) + "),=AVERAGE(G2:G"+ to_string(1 + noi)  + ")" << endl;
 }
 
 void set_param(int argc, char * argv[]) 

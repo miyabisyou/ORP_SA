@@ -25,6 +25,8 @@ int main(int argc, char * argv[])
 			exit(0);
   		}
 		csv_File << "Seed, Diametar, Diameter Gap, ASPL, ASPL Gap, switches, computing-time(sec.)" << endl;
+		csv_File << "\"=INDEX(A4:A" << param::tes + 3 << ",MATCH(D2,D4:D" << param::tes + 3 << ",0))\",\"=INDEX(B4:B" << param::tes + 3 << ",MATCH(D2,D4:D" << param::tes + 3 << ",0))\",\"=INDEX(C4:C" << param::tes + 3 << ",MATCH(D2,D4:D" << param::tes + 3 << ",0))\",=MIN(D4:D" << param::tes + 3 << "),\"=INDEX(E4:E" << param::tes + 3 << ",MATCH(D2,D4:D" << param::tes + 3 << ",0))\",\"=INDEX(F4:F" << param::tes + 3 << ",MATCH(D2,D4:D" << param::tes + 3 << ",0))\",\"=INDEX(G4:G" << param::tes + 3 << ",MATCH(D2,D4:D" << param::tes + 3 << ",0))\", BEST" << endl;
+		csv_File << "=AVERAGE(A4:A" << param::tes + 3 << "),=AVERAGE(B4:B" << param::tes + 3 << "),=AVERAGE(C4:C" << param::tes + 3 << "),=AVERAGE(D4:D" << param::tes + 3 << "),=AVERAGE(E4:E" << param::tes + 3 << "),=AVERAGE(F4:F" << param::tes + 3 << "),=AVERAGE(G4:G" << param::tes + 3 << "),AVERAGE" << endl;
 	#endif
 	for (int test = 0; test < param::tes; test++)
 	{
